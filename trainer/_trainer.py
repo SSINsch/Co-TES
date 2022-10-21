@@ -48,6 +48,7 @@ class NewsGroupTrainer:
         total_step = len(self.train_loader)
         total_loss_1, total_acc_1 = 0, 0
         total_loss_2, total_acc_2 = 0, 0
+        # Todo. Datset 수정에 따라서 넘겨져 오는 변수들 수가 달라졌음
         for step, (data, masks, labels, indexes) in enumerate(self.train_loader):
             # to cpu / to gpu
             ind = indexes.cpu().numpy().transpose()
@@ -58,6 +59,7 @@ class NewsGroupTrainer:
             self.optimizer1.zero_grad()
             self.optimizer2.zero_grad()
 
+            # Todo. model alg name에 따라 받아야 하는게 다름
             # to model 1
             if self.model1.alg_name == 'BERT':
                 logits_1 = self.model1(data,
@@ -65,11 +67,13 @@ class NewsGroupTrainer:
                                        attention_mask=masks)
             else:
                 logits_1 = self.model1(data)
+
             max_predictions, argmax_predictions = logits_1.max(1)
             acc_1 = basic_accuracy(argmax_predictions, labels)
             acc_1 = to_np(acc_1)
             total_acc_1 += acc_1
 
+            # Todo. model alg name에 따라 받아야 하는게 다름
             # to model 2
             if self.model2.alg_name == 'BERT':
                 logits_2 = self.model2(data,
@@ -77,6 +81,7 @@ class NewsGroupTrainer:
                                        attention_mask=masks)
             else:
                 logits_2 = self.model2(data)
+
             max_predictions, argmax_predictions = logits_2.max(1)
             acc_2 = basic_accuracy(argmax_predictions, labels)
             acc_2 = to_np(acc_2)
@@ -145,6 +150,7 @@ class NewsGroupTrainer:
         total_loss_1, total_loss_2 = 0, 0
 
         with torch.no_grad():
+            # Todo. Datset 수정에 따라서 넘겨져 오는 변수들 수가 달라졌음
             for step, (data, _, labels, indexes) in enumerate(loader):
                 # to cpu/gpu
                 ind = indexes.cpu().numpy().transpose()
@@ -152,9 +158,19 @@ class NewsGroupTrainer:
                 data = data.long().to(self.device)
 
                 # to model
-                # Todo. model 받는거 bert or not 에 따라 바뀜
+                # Todo. model alg name에 따라 받아야 하는게 다름
                 logits_1 = self.model1(data)
+                if self.model2.alg_name == 'BERT':
+                    logits_2 = self.model2(data,
+                                           token_type_ids=None,
+                                           attention_mask=masks)
+                else:
+                    logits_2 = self.model2(data)
+
+
                 max_predictions_1, argmax_predictions_1 = logits_1.max(1)
+
+
                 logits_2 = self.model2(data)
                 max_predictions_2, argmax_predictions_2 = logits_2.max(1)
 

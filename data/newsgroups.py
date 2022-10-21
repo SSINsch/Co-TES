@@ -8,6 +8,7 @@ import torch
 import torch.utils.data as data
 from sklearn.datasets import fetch_20newsgroups
 from transformers import BertTokenizer
+from torchtext.data import get_tokenizer
 
 from utils import noisify
 
@@ -49,9 +50,6 @@ class NewsGroups(data.TensorDataset):
             and  ``processed/test.pt`` exist.
         train (bool, optional): If True, creates dataset from ``training.pt``,
             otherwise from ``test.pt``.
-        download (bool, optional): If true, downloads the dataset from the internet and
-            puts it in root directory. If dataset is already downloaded, it is not
-            downloaded again.
         transform (callable, optional): A function/transform that  takes in an PIL image
             and returns a transformed version. E.g, ``transforms.RandomCrop``
         target_transform (callable, optional): A function/transform that takes in the
@@ -124,50 +122,51 @@ class NewsGroups(data.TensorDataset):
         return fmt_str
 
 
-class NewsGroupsForBert(data.TensorDataset):
-    def __init__(self, root='./data', train=True, noise_type=None, noise_rate=0.2, random_state=0, max_len=512):
-        super(NewsGroupsForBert).__init__()
+class NewsGroupsUpdate(data.TensorDataset):
+    def __init__(self, root='./data', train=True, noise_type=None, noise_rate=0.2, random_state=0, max_len=1000):
+        super(NewsGroupsUpdate).__init__()
         self.root = os.path.expanduser(root)
-        self.tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased', do_lower_case=False)
+        self.bert_tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased', do_lower_case=False)
+        self.basic_tokenizer = get_tokenizer('basic_english')
         self.max_len = max_len
         self.train = train  # training set or test set
         self.noise_type = noise_type
         self.dataset = 'news'
 
+        # vocab weight matrix (20000, 300) : (20000개 단어 각각 300dim vector)
+        self.vocab_weights_matrix = pickle.load(open(os.path.join(self.root, "news_vocab_glove_weight.pk"), "rb"))
+        # vocab_itos = ['<unk>', '<pad>', ...]
+        self.vocab_itos = pickle.load(open(os.path.join(self.root, "news_vocab_list.pk"), "rb"))
+        # vocab_stoi = {'<unk>': 0, '<pad>': 1, ...}
+        self.vocab_stoi = {k: v for v, k in enumerate(self.vocab_itos)}
+
         if self.train is True:
             raw_data = fetch_20newsgroups(subset='train')
         else:
             raw_data = fetch_20newsgroups(subset='test')
-        sentences = np.asarray(raw_data.data)
+        self.sentences = np.asarray(raw_data.data)
         labels = raw_data.target
         labels = regroup_dataset(labels)
-        length = labels.shape[0]
         self.num_classes = len(set(labels))
+        self.labels = torch.from_numpy(labels).long()
 
-        if self.train:
-            self.train_data = sentences[:int(length * 0.70)]
-            self.train_labels = torch.from_numpy(labels[:int(length * 0.70)]).long()
-
-            # noisify train data
-            if noise_type is not None:
-                self.train_labels = np.asarray([[self.train_labels[i]] for i in range(len(self.train_labels))])
-                self.train_noisy_labels, self.actual_noise_rate = noisify(dataset=self.dataset,
-                                                                          nb_classes=self.num_classes,
-                                                                          train_labels=self.train_labels,
-                                                                          noise_type=noise_type,
-                                                                          noise_rate=noise_rate,
-                                                                          random_state=random_state)
-                self.train_noisy_labels = [i[0] for i in self.train_noisy_labels]
-                _train_labels = [i[0] for i in self.train_labels]
-                self.noise_or_not = np.transpose(self.train_noisy_labels) == np.transpose(_train_labels)
-                logger.info(f'label precision: {1 - self.actual_noise_rate}')
-        else:
-            self.test_data = torch.from_numpy(sentences[int(length * 0.70):])
-            self.test_labels = torch.from_numpy(labels[int(length * 0.70):]).long()
+        # noisify train data label
+        if (self.noise_type is not None) and (self.train is True):
+            self.labels = np.asarray([[self.labels[i]] for i in range(len(self.labels))])
+            self.noisy_labels, self.actual_noise_rate = noisify(dataset=self.dataset,
+                                                                nb_classes=self.num_classes,
+                                                                train_labels=self.labels,
+                                                                noise_type=noise_type,
+                                                                noise_rate=noise_rate,
+                                                                random_state=random_state)
+            self.noisy_labels = [i[0] for i in self.noisy_labels]
+            _clean_labels = [i[0] for i in self.labels]
+            self.noise_or_not = np.transpose(self.noisy_labels) == np.transpose(_clean_labels)
+            logger.info(f'label precision: {1 - self.actual_noise_rate}')
 
     def __getitem__(self, index):
-        text = self.train_data[index]
-        encoding = self.tokenizer.encode_plus(
+        text = self.sentences[index]
+        bert_encoding = self.bert_tokenizer.encode_plus(
             text,
             add_special_tokens=True,
             max_length=self.max_len,
@@ -177,12 +176,29 @@ class NewsGroupsForBert(data.TensorDataset):
             return_tensors='pt',
         )
 
-        if self.train is True:
-            if self.noise_type is not None:
-                target = self.train_noisy_labels[index]
-            else:
-                target = self.train_labels[index]
-        else:
-            target = self.test_labels[index]
+        basic_encoding = []
+        basic_tokenized_text = self.basic_tokenizer(text)
+        for tok in basic_tokenized_text:
+            try:
+                basic_encoding.append(self.vocab_stoi[tok])
+            except KeyError as ke:
+                basic_encoding.append(self.vocab_stoi['<unk>'])
 
-        return encoding['input_ids'], encoding['attention_mask'], target, index
+        if len(basic_encoding) > self.max_len:
+            basic_encoding = np.asarray(basic_encoding[:self.max_len])
+        else:
+            z = np.zeros(self.max_len - len(basic_encoding)).astype(int)
+            basic_encoding = np.asarray(basic_encoding)
+            basic_encoding = np.append(z, basic_encoding)
+
+        if (self.noise_type is not None) and (self.train is True):
+            target = self.noisy_labels[index]
+        else:
+            target = self.labels[index]
+
+        return bert_encoding['input_ids'], bert_encoding['attention_mask'], basic_encoding, target, index
+
+
+if __name__ == '__main__':
+    test_dataset = NewsGroupsUpdate(root='../data')
+
