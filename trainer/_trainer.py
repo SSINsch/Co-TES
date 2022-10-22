@@ -48,39 +48,38 @@ class NewsGroupTrainer:
         total_step = len(self.train_loader)
         total_loss_1, total_acc_1 = 0, 0
         total_loss_2, total_acc_2 = 0, 0
-        # Todo. Datset 수정에 따라서 넘겨져 오는 변수들 수가 달라졌음
-        for step, (data, masks, labels, indexes) in enumerate(self.train_loader):
+        for step, (bert_id, bert_mask, basic_id, labels, ind) in enumerate(self.train_loader):
             # to cpu / to gpu
-            ind = indexes.cpu().numpy().transpose()
+            ind = ind.cpu().numpy().transpose()
             labels = labels.to(self.device)
-            data = data.long().to(self.device)
+            bert_id = bert_id.long().to(self.device)
+            basic_id = basic_id.long().to(self.device)
+            bert_mask = bert_mask.long().to(self.device)
 
             # initialize optimizer
             self.optimizer1.zero_grad()
             self.optimizer2.zero_grad()
 
-            # Todo. model alg name에 따라 받아야 하는게 다름
             # to model 1
             if self.model1.alg_name == 'BERT':
-                logits_1 = self.model1(data,
+                logits_1 = self.model1(bert_id,
                                        token_type_ids=None,
-                                       attention_mask=masks)
+                                       attention_mask=bert_mask)
             else:
-                logits_1 = self.model1(data)
+                logits_1 = self.model1(basic_id)
 
             max_predictions, argmax_predictions = logits_1.max(1)
             acc_1 = basic_accuracy(argmax_predictions, labels)
             acc_1 = to_np(acc_1)
             total_acc_1 += acc_1
 
-            # Todo. model alg name에 따라 받아야 하는게 다름
             # to model 2
             if self.model2.alg_name == 'BERT':
-                logits_2 = self.model2(data,
+                logits_2 = self.model2(bert_id,
                                        token_type_ids=None,
-                                       attention_mask=masks)
+                                       attention_mask=bert_mask)
             else:
-                logits_2 = self.model2(data)
+                logits_2 = self.model2(basic_id)
 
             max_predictions, argmax_predictions = logits_2.max(1)
             acc_2 = basic_accuracy(argmax_predictions, labels)
@@ -150,28 +149,32 @@ class NewsGroupTrainer:
         total_loss_1, total_loss_2 = 0, 0
 
         with torch.no_grad():
-            # Todo. Datset 수정에 따라서 넘겨져 오는 변수들 수가 달라졌음
-            for step, (data, _, labels, indexes) in enumerate(loader):
+            for step, (bert_id, bert_mask, basic_id, labels, ind) in enumerate(loader):
                 # to cpu/gpu
-                ind = indexes.cpu().numpy().transpose()
+                ind = ind.cpu().numpy().transpose()
                 labels = labels.to(self.device)
-                data = data.long().to(self.device)
+                bert_id = bert_id.long().to(self.device)
+                basic_id = basic_id.long().to(self.device)
+                bert_mask = bert_mask.long().to(self.device)
 
                 # to model
-                # Todo. model alg name에 따라 받아야 하는게 다름
-                logits_1 = self.model1(data)
-                if self.model2.alg_name == 'BERT':
-                    logits_2 = self.model2(data,
+                if self.model1.alg_name == 'BERT':
+                    logits_1 = self.model1(bert_id,
                                            token_type_ids=None,
-                                           attention_mask=masks)
+                                           attention_mask=bert_mask)
                 else:
-                    logits_2 = self.model2(data)
-
+                    logits_1 = self.model1(basic_id)
 
                 max_predictions_1, argmax_predictions_1 = logits_1.max(1)
 
+                # to model 2
+                if self.model2.alg_name == 'BERT':
+                    logits_2 = self.model2(bert_id,
+                                           token_type_ids=None,
+                                           attention_mask=bert_mask)
+                else:
+                    logits_2 = self.model2(basic_id)
 
-                logits_2 = self.model2(data)
                 max_predictions_2, argmax_predictions_2 = logits_2.max(1)
 
                 # get loss

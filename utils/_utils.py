@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 def arg_parse():
     parser = argparse.ArgumentParser()
     parser.add_argument('--seed', type=int, default=1)
-    parser.add_argument('--batch_size', type=int, default=128)
+    parser.add_argument('--batch_size', type=int, default=32)
     parser.add_argument('--dataset', type=str, help='now only support news dataset', default='news')
     parser.add_argument('--model1', type=str, help='first model type')
     parser.add_argument('--model2', type=str, help='secibd model type')
@@ -32,7 +32,9 @@ def arg_parse():
 
     args = parser.parse_args()
 
-    # Todo. should check num_gradual > n_epoch
+    if args.num_gradual > args.n_epoch:
+        logging.warning(f'(num_gradual) should be greater than (n_epoch) : {args.num_gradual}, {args.n_epoch}')
+        raise ValueError(f'(num_gradual) should be greater than (n_epoch) : {args.num_gradual}, {args.n_epoch}')
     log_m = f'[Args] (seed: {args.seed}), (model1: {args.model1}), '
     log_m += f'(model2: {args.model2}), (noise_rate: {args.noise_rate})'
     logger.debug(log_m)

@@ -8,13 +8,15 @@ from torch.utils.tensorboard import SummaryWriter
 from transformers import BertForSequenceClassification
 
 from utils import arg_parse, gen_forget_rate, adjust_learning_rate
-from data import NewsGroups, NewsGroupsUpdate
+from data import NewsGroupsOriginal, NewsGroupsUpdate
 from model import NewsNet, NewsNetCNN, NewsNetLSTM, BertClassifier
 from trainer import NewsGroupTrainer
 from model import NewsNetVDCNN
 
 import logging.config
 import json
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 config = json.load(open('./logger.json'))
 logging.config.dictConfig(config)

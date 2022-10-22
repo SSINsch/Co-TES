@@ -43,7 +43,7 @@ def regroup_dataset(labels):
     return batch_y
 
 
-class NewsGroups(data.TensorDataset):
+class NewsGroupsOriginal(data.TensorDataset):
     """
     Args:
         root (string): Root directory of dataset where ``processed/training.pt``
@@ -123,7 +123,7 @@ class NewsGroups(data.TensorDataset):
 
 
 class NewsGroupsUpdate(data.TensorDataset):
-    def __init__(self, root='./data', train=True, noise_type=None, noise_rate=0.2, random_state=0, max_len=1000):
+    def __init__(self, root='./data', train=True, noise_type=None, noise_rate=0.2, random_state=0, max_len=512):
         super(NewsGroupsUpdate).__init__()
         self.root = os.path.expanduser(root)
         self.bert_tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased', do_lower_case=False)
@@ -139,6 +139,9 @@ class NewsGroupsUpdate(data.TensorDataset):
         self.vocab_itos = pickle.load(open(os.path.join(self.root, "news_vocab_list.pk"), "rb"))
         # vocab_stoi = {'<unk>': 0, '<pad>': 1, ...}
         self.vocab_stoi = {k: v for v, k in enumerate(self.vocab_itos)}
+
+        # Todo.__getitem__에서 사용하는 encoding 결과들을 미리 저장해두고 불러와서 속도를 높이자.
+        # if 문으로 처리해서 pk이 있으면 로드하고 아니면 tokenizer 선언 후 tokenize하도록 변경하면 될듯.
 
         if self.train is True:
             raw_data = fetch_20newsgroups(subset='train')
@@ -164,6 +167,9 @@ class NewsGroupsUpdate(data.TensorDataset):
             self.noise_or_not = np.transpose(self.noisy_labels) == np.transpose(_clean_labels)
             logger.info(f'label precision: {1 - self.actual_noise_rate}')
 
+    def __len__(self):
+        return len(self.sentences)
+
     def __getitem__(self, index):
         text = self.sentences[index]
         bert_encoding = self.bert_tokenizer.encode_plus(
@@ -174,6 +180,7 @@ class NewsGroupsUpdate(data.TensorDataset):
             pad_to_max_length=True,
             return_attention_mask=True,
             return_tensors='pt',
+            truncation=True
         )
 
         basic_encoding = []
@@ -190,13 +197,17 @@ class NewsGroupsUpdate(data.TensorDataset):
             z = np.zeros(self.max_len - len(basic_encoding)).astype(int)
             basic_encoding = np.asarray(basic_encoding)
             basic_encoding = np.append(z, basic_encoding)
+        basic_encoding = torch.from_numpy(basic_encoding)
 
         if (self.noise_type is not None) and (self.train is True):
             target = self.noisy_labels[index]
         else:
             target = self.labels[index]
 
-        return bert_encoding['input_ids'], bert_encoding['attention_mask'], basic_encoding, target, index
+        input_ids = bert_encoding['input_ids'].flatten()
+        att_masks = bert_encoding['attention_mask'].flatten()
+
+        return input_ids, att_masks, basic_encoding, target, index
 
 
 if __name__ == '__main__':
