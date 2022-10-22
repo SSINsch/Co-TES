@@ -8,6 +8,7 @@ import torch
 import torch.utils.data as data
 from sklearn.datasets import fetch_20newsgroups
 from transformers import BertTokenizer
+from torchtext.data import get_tokenizer
 
 from utils import noisify
 
@@ -42,7 +43,7 @@ def regroup_dataset(labels):
     return batch_y
 
 
-class NewsGroups(data.TensorDataset):
+class NewsGroupsOriginal(data.TensorDataset):
     """
     Args:
         root (string): Root directory of dataset where ``processed/training.pt``
@@ -98,8 +99,9 @@ class NewsGroups(data.TensorDataset):
                 img, target = self.train_data[index], self.train_labels[index]
         else:
             img, target = self.test_data[index], self.test_labels[index]
+        mask = 0
 
-        return img, target, index
+        return img, mask, target, index
 
     def __len__(self):
         if self.train:
@@ -118,3 +120,96 @@ class NewsGroups(data.TensorDataset):
         tmp = '    Target Transforms (if any): '
         fmt_str += '{0}{1}'.format(tmp, self.target_transform.__repr__().replace('\n', '\n' + ' ' * len(tmp)))
         return fmt_str
+
+
+class NewsGroupsUpdate(data.TensorDataset):
+    def __init__(self, root='./data', train=True, noise_type=None, noise_rate=0.2, random_state=0, max_len=512):
+        super(NewsGroupsUpdate).__init__()
+        self.root = os.path.expanduser(root)
+        self.bert_tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased', do_lower_case=False)
+        self.basic_tokenizer = get_tokenizer('basic_english')
+        self.max_len = max_len
+        self.train = train  # training set or test set
+        self.noise_type = noise_type
+        self.dataset = 'news'
+
+        # vocab weight matrix (20000, 300) : (20000개 단어 각각 300dim vector)
+        self.vocab_weights_matrix = pickle.load(open(os.path.join(self.root, "news_vocab_glove_weight.pk"), "rb"))
+        # vocab_itos = ['<unk>', '<pad>', ...]
+        self.vocab_itos = pickle.load(open(os.path.join(self.root, "news_vocab_list.pk"), "rb"))
+        # vocab_stoi = {'<unk>': 0, '<pad>': 1, ...}
+        self.vocab_stoi = {k: v for v, k in enumerate(self.vocab_itos)}
+
+        # Todo.__getitem__에서 사용하는 encoding 결과들을 미리 저장해두고 불러와서 속도를 높이자.
+        # if 문으로 처리해서 pk이 있으면 로드하고 아니면 tokenizer 선언 후 tokenize하도록 변경하면 될듯.
+
+        if self.train is True:
+            raw_data = fetch_20newsgroups(subset='train')
+        else:
+            raw_data = fetch_20newsgroups(subset='test')
+        self.sentences = np.asarray(raw_data.data)
+        labels = raw_data.target
+        labels = regroup_dataset(labels)
+        self.num_classes = len(set(labels))
+        self.labels = torch.from_numpy(labels).long()
+
+        # noisify train data label
+        if (self.noise_type is not None) and (self.train is True):
+            self.labels = np.asarray([[self.labels[i]] for i in range(len(self.labels))])
+            self.noisy_labels, self.actual_noise_rate = noisify(dataset=self.dataset,
+                                                                nb_classes=self.num_classes,
+                                                                train_labels=self.labels,
+                                                                noise_type=noise_type,
+                                                                noise_rate=noise_rate,
+                                                                random_state=random_state)
+            self.noisy_labels = [i[0] for i in self.noisy_labels]
+            _clean_labels = [i[0] for i in self.labels]
+            self.noise_or_not = np.transpose(self.noisy_labels) == np.transpose(_clean_labels)
+            logger.info(f'label precision: {1 - self.actual_noise_rate}')
+
+    def __len__(self):
+        return len(self.sentences)
+
+    def __getitem__(self, index):
+        text = self.sentences[index]
+        bert_encoding = self.bert_tokenizer.encode_plus(
+            text,
+            add_special_tokens=True,
+            max_length=self.max_len,
+            return_token_type_ids=False,
+            pad_to_max_length=True,
+            return_attention_mask=True,
+            return_tensors='pt',
+            truncation=True
+        )
+
+        basic_encoding = []
+        basic_tokenized_text = self.basic_tokenizer(text)
+        for tok in basic_tokenized_text:
+            try:
+                basic_encoding.append(self.vocab_stoi[tok])
+            except KeyError as ke:
+                basic_encoding.append(self.vocab_stoi['<unk>'])
+
+        if len(basic_encoding) > self.max_len:
+            basic_encoding = np.asarray(basic_encoding[:self.max_len])
+        else:
+            z = np.zeros(self.max_len - len(basic_encoding)).astype(int)
+            basic_encoding = np.asarray(basic_encoding)
+            basic_encoding = np.append(z, basic_encoding)
+        basic_encoding = torch.from_numpy(basic_encoding)
+
+        if (self.noise_type is not None) and (self.train is True):
+            target = self.noisy_labels[index]
+        else:
+            target = self.labels[index]
+
+        input_ids = bert_encoding['input_ids'].flatten()
+        att_masks = bert_encoding['attention_mask'].flatten()
+
+        return input_ids, att_masks, basic_encoding, target, index
+
+
+if __name__ == '__main__':
+    test_dataset = NewsGroupsUpdate(root='../data')
+

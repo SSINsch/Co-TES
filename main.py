@@ -5,15 +5,18 @@ from datetime import datetime
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
+from transformers import BertForSequenceClassification
 
 from utils import arg_parse, gen_forget_rate, adjust_learning_rate
-from data import NewsGroups
-from model import NewsNet, NewsNetCNN, NewsNetLSTM
+from data import NewsGroupsOriginal, NewsGroupsUpdate
+from model import NewsNet, NewsNetCNN, NewsNetLSTM, BertClassifier
 from trainer import NewsGroupTrainer
 from model import NewsNetVDCNN
 
 import logging.config
 import json
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 config = json.load(open('./logger.json'))
 logging.config.dictConfig(config)
@@ -54,18 +57,16 @@ def main():
     # load dataset
     if args.dataset == 'news':
         init_epoch = 0
-        train_dataset = NewsGroups(root='./data/',
-                                   train=True,
-                                   transform=transforms.ToTensor(),
-                                   noise_type=args.noise_type,
-                                   noise_rate=args.noise_rate
-                                   )
-        test_dataset = NewsGroups(root='./data/',
-                                  train=False,
-                                  transform=transforms.ToTensor(),
-                                  noise_type=args.noise_type,
-                                  noise_rate=args.noise_rate
-                                  )
+        train_dataset = NewsGroupsUpdate(root='./data/',
+                                         train=True,
+                                         noise_type=args.noise_type,
+                                         noise_rate=args.noise_rate
+                                         )
+        test_dataset = NewsGroupsUpdate(root='./data/',
+                                        train=False,
+                                        noise_type=args.noise_type,
+                                        noise_rate=args.noise_rate
+                                        )
         num_classes = train_dataset.num_classes
 
     else:
@@ -88,13 +89,20 @@ def main():
     # build model 1
     logger.info('Building model...')
     if args.model1 == 'fcn':
-        clf1 = NewsNet(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
+        clf1 = NewsNet(weights_matrix=train_dataset.vocab_weights_matrix, num_classes=num_classes)
     elif args.model1 == 'cnn':
-        clf1 = NewsNetCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
+        clf1 = NewsNetCNN(weights_matrix=train_dataset.vocab_weights_matrix, num_classes=num_classes)
     elif args.model1 == 'lstm':
-        clf1 = NewsNetLSTM(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
+        clf1 = NewsNetLSTM(weights_matrix=train_dataset.vocab_weights_matrix, num_classes=num_classes)
     elif args.model1 == 'vdcnn':
-        clf1 = NewsNetVDCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
+        clf1 = NewsNetVDCNN(weights_matrix=train_dataset.vocab_weights_matrix, num_classes=num_classes)
+    elif args.model1 == 'bert':
+        clf1 = BertClassifier.from_pretrained(
+            "bert-base-multilingual-cased",
+            num_labels=num_classes,
+            output_attentions=False,
+            output_hidden_states=False
+        )
     else:
         raise Exception(f'Unknown model name {args.model1}')
 
@@ -104,13 +112,20 @@ def main():
 
     # build model 2
     if args.model2 == 'fcn':
-        clf2 = NewsNet(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
+        clf2 = NewsNet(weights_matrix=train_dataset.vocab_weights_matrix, num_classes=num_classes)
     elif args.model2 == 'cnn':
-        clf2 = NewsNetCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
+        clf2 = NewsNetCNN(weights_matrix=train_dataset.vocab_weights_matrix, num_classes=num_classes)
     elif args.model2 == 'lstm':
-        clf2 = NewsNetLSTM(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
+        clf2 = NewsNetLSTM(weights_matrix=train_dataset.vocab_weights_matrix, num_classes=num_classes)
     elif args.model2 == 'vdcnn':
-        clf2 = NewsNetVDCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
+        clf2 = NewsNetVDCNN(weights_matrix=train_dataset.vocab_weights_matrix, num_classes=num_classes)
+    elif args.model2 == 'bert':
+        clf2 = BertClassifier.from_pretrained(
+            "bert-base-multilingual-cased",
+            num_labels=num_classes,
+            output_attentions=False,
+            output_hidden_states=False
+        )
     else:
         raise Exception(f'Unknown model name {args.model2}')
 

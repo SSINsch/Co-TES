@@ -48,25 +48,41 @@ class NewsGroupTrainer:
         total_step = len(self.train_loader)
         total_loss_1, total_acc_1 = 0, 0
         total_loss_2, total_acc_2 = 0, 0
-        for step, (data, labels, indexes) in enumerate(self.train_loader):
+        for step, (bert_id, bert_mask, basic_id, labels, ind) in enumerate(self.train_loader):
             # to cpu / to gpu
-            ind = indexes.cpu().numpy().transpose()
+            ind = ind.cpu().numpy().transpose()
             labels = labels.to(self.device)
-            data = data.long().to(self.device)
+            bert_id = bert_id.long().to(self.device)
+            basic_id = basic_id.long().to(self.device)
+            bert_mask = bert_mask.long().to(self.device)
 
             # initialize optimizer
             self.optimizer1.zero_grad()
             self.optimizer2.zero_grad()
 
             # to model 1
-            logits_1 = self.model1(data)
+            if self.model1.alg_name == 'BERT':
+                out = self.model1(bert_id,
+                                  token_type_ids=None,
+                                  attention_mask=bert_mask)
+                logits_1 = out.logits
+            else:
+                logits_1 = self.model1(basic_id)
+
             max_predictions, argmax_predictions = logits_1.max(1)
             acc_1 = basic_accuracy(argmax_predictions, labels)
             acc_1 = to_np(acc_1)
             total_acc_1 += acc_1
 
             # to model 2
-            logits_2 = self.model2(data)
+            if self.model2.alg_name == 'BERT':
+                out = self.model2(bert_id,
+                                  token_type_ids=None,
+                                  attention_mask=bert_mask)
+                logits_2 = out.logits
+            else:
+                logits_2 = self.model2(basic_id)
+
             max_predictions, argmax_predictions = logits_2.max(1)
             acc_2 = basic_accuracy(argmax_predictions, labels)
             acc_2 = to_np(acc_2)
@@ -135,16 +151,34 @@ class NewsGroupTrainer:
         total_loss_1, total_loss_2 = 0, 0
 
         with torch.no_grad():
-            for step, (data, labels, indexes) in enumerate(loader):
+            for step, (bert_id, bert_mask, basic_id, labels, ind) in enumerate(loader):
                 # to cpu/gpu
-                ind = indexes.cpu().numpy().transpose()
+                ind = ind.cpu().numpy().transpose()
                 labels = labels.to(self.device)
-                data = data.long().to(self.device)
+                bert_id = bert_id.long().to(self.device)
+                basic_id = basic_id.long().to(self.device)
+                bert_mask = bert_mask.long().to(self.device)
 
                 # to model
-                logits_1 = self.model1(data)
+                if self.model1.alg_name == 'BERT':
+                    out = self.model1(bert_id,
+                                      token_type_ids=None,
+                                      attention_mask=bert_mask)
+                    logits_1 = out.logits
+                else:
+                    logits_1 = self.model1(basic_id)
+
                 max_predictions_1, argmax_predictions_1 = logits_1.max(1)
-                logits_2 = self.model2(data)
+
+                # to model 2
+                if self.model2.alg_name == 'BERT':
+                    out = self.model2(bert_id,
+                                      token_type_ids=None,
+                                      attention_mask=bert_mask)
+                    logits_2 = out.logits
+                else:
+                    logits_2 = self.model2(basic_id)
+
                 max_predictions_2, argmax_predictions_2 = logits_2.max(1)
 
                 # get loss
