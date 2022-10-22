@@ -62,9 +62,10 @@ class NewsGroupTrainer:
 
             # to model 1
             if self.model1.alg_name == 'BERT':
-                logits_1 = self.model1(bert_id,
-                                       token_type_ids=None,
-                                       attention_mask=bert_mask)
+                out = self.model1(bert_id,
+                                  token_type_ids=None,
+                                  attention_mask=bert_mask)
+                logits_1 = out.logits
             else:
                 logits_1 = self.model1(basic_id)
 
@@ -75,9 +76,10 @@ class NewsGroupTrainer:
 
             # to model 2
             if self.model2.alg_name == 'BERT':
-                logits_2 = self.model2(bert_id,
-                                       token_type_ids=None,
-                                       attention_mask=bert_mask)
+                out = self.model2(bert_id,
+                                  token_type_ids=None,
+                                  attention_mask=bert_mask)
+                logits_2 = out.logits
             else:
                 logits_2 = self.model2(basic_id)
 
@@ -159,9 +161,10 @@ class NewsGroupTrainer:
 
                 # to model
                 if self.model1.alg_name == 'BERT':
-                    logits_1 = self.model1(bert_id,
-                                           token_type_ids=None,
-                                           attention_mask=bert_mask)
+                    out = self.model1(bert_id,
+                                      token_type_ids=None,
+                                      attention_mask=bert_mask)
+                    logits_1 = out.logits
                 else:
                     logits_1 = self.model1(basic_id)
 
@@ -169,9 +172,10 @@ class NewsGroupTrainer:
 
                 # to model 2
                 if self.model2.alg_name == 'BERT':
-                    logits_2 = self.model2(bert_id,
-                                           token_type_ids=None,
-                                           attention_mask=bert_mask)
+                    out = self.model2(bert_id,
+                                      token_type_ids=None,
+                                      attention_mask=bert_mask)
+                    logits_2 = out.logits
                 else:
                     logits_2 = self.model2(basic_id)
 
