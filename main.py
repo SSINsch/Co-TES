@@ -88,11 +88,11 @@ def main():
     # build model 1
     logger.info('Building model...')
     if args.model1 == 'fcn':
-        clf1 = NewsNet(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
+        clf1 = NewsNet(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, hidden_size=args.fcn_opt1)
     elif args.model1 == 'cnn':
         clf1 = NewsNetCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, kernel_windows=[3,4])
     elif args.model1 == 'lstm':
-        clf1 = NewsNetLSTM(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, hidden_size=100)
+        clf1 = NewsNetLSTM(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, hidden_size=args.lstm_opt1)
     elif args.model1 == 'vdcnn':
         clf1 = NewsNetVDCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
     else:
@@ -104,11 +104,11 @@ def main():
 
     # build model 2
     if args.model2 == 'fcn':
-        clf2 = NewsNet(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
+        clf2 = NewsNet(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, hidden_size=args.fcn_opt2)
     elif args.model2 == 'cnn':
         clf2 = NewsNetCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, kernel_windows=[5,6])
     elif args.model2 == 'lstm':
-        clf2 = NewsNetLSTM(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, hidden_size=300)
+        clf2 = NewsNetLSTM(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, hidden_size=args.lstm_opt2)
     elif args.model2 == 'vdcnn':
         clf2 = NewsNetVDCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
     else:

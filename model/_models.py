@@ -10,7 +10,7 @@ def call_bn(bn, x):
 class NewsNet(nn.Module):
     alg_name = 'FCN'
 
-    def __init__(self, weights_matrix, context_size=1000, hidden_size=300, num_classes=7):
+    def __init__(self, weights_matrix, hidden_size=300, num_classes=7):
         super(NewsNet, self).__init__()
         n_embed, d_embed = weights_matrix.shape
         self.embedding = nn.Embedding(n_embed, d_embed)
@@ -44,6 +44,7 @@ class NewsNetCNN(nn.Module):
     alg_name = 'CNN'
 
     def __init__(self, weights_matrix,
+                 kernel_windows=[3, 4, 5],
                  input_channel=1, dropout_rate=0.25, momentum=0.1, num_classes=7):
         super(NewsNetCNN, self).__init__()
         self.num_classes = num_classes
@@ -55,17 +56,17 @@ class NewsNetCNN(nn.Module):
         self.embedding.weight.data.copy_(torch.Tensor(weights_matrix))
 
         # CNN용 변수들
-        kernel_windows = [3, 4, 5]
+        self.kernel_windows = kernel_windows
         self.dropout_rate = dropout_rate
         self.momentum = momentum
         self.input_channel = input_channel
         self.convs = nn.ModuleList(
-            [nn.Conv2d(self.input_channel, self.d_embed, kernel_size=(k, self.d_embed)) for k in kernel_windows]
+            [nn.Conv2d(self.input_channel, self.d_embed, kernel_size=(k, self.d_embed)) for k in self.kernel_windows]
         )
 
         # 기타 layer
         self.dropout = nn.Dropout(dropout_rate)
-        self.linear = nn.Linear(len(kernel_windows) * self.d_embed, num_classes)
+        self.linear = nn.Linear(len(self.kernel_windows) * self.d_embed, num_classes)
 
     def forward(self, x):
         # input (128, 1000) : (128 batch size), (1000 아마 word token 개수??)
