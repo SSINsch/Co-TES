@@ -90,9 +90,9 @@ def main():
     if args.model1 == 'fcn':
         clf1 = NewsNet(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
     elif args.model1 == 'cnn':
-        clf1 = NewsNetCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
+        clf1 = NewsNetCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, kernel_windows=[3,4])
     elif args.model1 == 'lstm':
-        clf1 = NewsNetLSTM(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
+        clf1 = NewsNetLSTM(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, hidden_size=100)
     elif args.model1 == 'vdcnn':
         clf1 = NewsNetVDCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
     else:
@@ -106,9 +106,9 @@ def main():
     if args.model2 == 'fcn':
         clf2 = NewsNet(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
     elif args.model2 == 'cnn':
-        clf2 = NewsNetCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
+        clf2 = NewsNetCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, kernel_windows=[5,6])
     elif args.model2 == 'lstm':
-        clf2 = NewsNetLSTM(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
+        clf2 = NewsNetLSTM(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, hidden_size=300)
     elif args.model2 == 'vdcnn':
         clf2 = NewsNetVDCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
     else:
@@ -134,7 +134,7 @@ def main():
                                   optimizer2=optimizer2,
                                   device=args.device,
                                   init_epoch=init_epoch,
-                                  output_dir='',
+                                  output_dir=f'{save_dir}/{model_str}',
                                   train_loader=train_loader,
                                   model_type=args.model_type,
                                   rate_schedule=rate_schedule,
@@ -149,28 +149,20 @@ def main():
         adjust_learning_rate(optimizer=optimizer2, epoch=epoch, alpha_plan=alpha_plan, beta1_plan=beta1_plan)
 
         # train
-        train_result, _ = ng_trainer.train(n_epoch=epoch)
+        train_result, model_summary_path = ng_trainer.train(n_epoch=epoch)
 
         # evaluate
-        eval_result, _ = ng_trainer.evaluate(model_summary_path='', n_epoch=epoch, mode='test')
+        test_result, _ = ng_trainer.evaluate(model_summary_path=model_summary_path, n_epoch=epoch, mode='test')
 
         # save results
-        """
-        writer.add_scalars(main_tag='Loss/train_eval',
+        writer.add_scalars(main_tag='Loss/train_test',
                            global_step=epoch,
                            tag_scalar_dict={'train_loss': train_result['Avg loss'],
-                                            'val_loss': eval_result['Avg loss']})
-        writer.add_scalars(main_tag='Acc/train_eval_test',
+                                            'val_loss': test_result['loss']})
+        writer.add_scalars(main_tag='Acc/train_test',
                            global_step=epoch,
-                           tag_scalar_dict={'train_loss': train_result['Avg acc'],
-                                            'val_loss': eval_result['Acc'],
-                                            'test_loss': test_result['Acc']})
-        writer.add_scalars(main_tag='F1/train_eval_test',
-                           global_step=epoch,
-                           tag_scalar_dict={'train_loss': train_result['Avg f1'],
-                                            'val_loss': eval_result['F1'],
-                                            'test_loss': test_result['Acc']})
-        """
+                           tag_scalar_dict={'train_acc': train_result['Avg acc'],
+                                            'test_acc': test_result['Acc']})
 
     writer.close()
 

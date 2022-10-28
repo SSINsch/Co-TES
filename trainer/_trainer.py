@@ -1,4 +1,5 @@
 from sklearn.metrics import f1_score
+import os
 import torch
 import torch.nn.functional as F
 
@@ -36,12 +37,66 @@ class NewsGroupTrainer:
         self.noise_or_not = noise_or_not
 
     def save_model(self, n_epoch, avg_loss, accuracy, macro_f1_score, mode):
-        return 0
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
+
+        model1_to_save = self.model1.module if hasattr(self.model1, 'module') else self.model1
+        model2_to_save = self.model2.module if hasattr(self.model2, 'module') else self.model2
+        postfix1 = f'model1_{self.model1.alg_name}_{mode}_{n_epoch:03d}.bin'
+        postfix2 = f'model2_{self.model2.alg_name}_{mode}_{n_epoch:03d}.bin'
+        output_path1 = os.path.join(self.output_dir, postfix1)
+        output_path2 = os.path.join(self.output_dir, postfix2)
+
+        if mode == 'train':
+            torch.save({
+                'mode': mode,
+                'epoch': n_epoch,
+                'model_state_dict': model1_to_save.state_dict(),
+                'optimizer_state_dict': self.optimizer1.state_dict(),
+                'loss': avg_loss,
+                'accuracy': accuracy,
+                'f1-score': macro_f1_score
+            }, output_path1)
+            torch.save({
+                'mode': mode,
+                'epoch': n_epoch,
+                'model_state_dict': model2_to_save.state_dict(),
+                'optimizer_state_dict': self.optimizer2.state_dict(),
+                'loss': avg_loss,
+                'accuracy': accuracy,
+                'f1-score': macro_f1_score
+            }, output_path2)
+        else:
+            torch.save({
+                'mode': mode,
+                'epoch': n_epoch,
+                'loss': avg_loss,
+                'accuracy': accuracy,
+                'f1-score': macro_f1_score
+            }, output_path1)
+            torch.save({
+                'mode': mode,
+                'epoch': n_epoch,
+                'loss': avg_loss,
+                'accuracy': accuracy,
+                'f1-score': macro_f1_score
+            }, output_path2)
+
+        logger.info(f"Saving model checkpoint to as {output_path1} and {output_path2}")
+
+        return output_path1, output_path2
 
     def load_model(self, model_path):
-        return 0
+        model_path1, model_path2 = model_path
+        checkpoint = torch.load(model_path1)
+        self.model1.load_state_dict(checkpoint['model_state_dict'])
+        self.optimizer1.load_state_dict(checkpoint['optimizer_state_dict'])
+        checkpoint = torch.load(model_path2)
+        self.model2.load_state_dict(checkpoint['model_state_dict'])
+        self.optimizer2.load_state_dict(checkpoint['optimizer_state_dict'])
+        logger.info(f"Load model checkpoint from {model_path1} and {model_path2}")
 
-    def train(self, n_epoch):
+    def train(self, n_epoch, save=False):
         self.model1.train()
         self.model2.train()
 
@@ -108,15 +163,25 @@ class NewsGroupTrainer:
         avg_loss_1 = total_loss_1 / total_step
         avg_loss_2 = total_loss_2 / total_step
 
-        train_result = {'Avg acc 1': avg_acc_1, 'Avg f1-score 1': 0, 'Avg loss 1': avg_loss_1,
-                        'Avg acc 2': avg_acc_2, 'Avg f1-score 2': 0, 'Avg loss 2': avg_loss_2}
+        if avg_acc_1 > avg_acc_2:
+            avg_acc = avg_acc_1
+            avg_loss = avg_loss_1
+            avg_f1 = 0
+        else:
+            avg_acc = avg_acc_2
+            avg_loss = avg_loss_2
+            avg_f1 = 0
 
-        # model_summary_path = self.save_model(n_epoch, avg_loss, avg_acc, avg_f1, mode='train')
-        model_summary_path = None
+        if save is True:
+            model_summary_path = self.save_model(n_epoch, avg_loss, avg_acc, avg_f1, mode='train')
+        else:
+            model_summary_path = ''
+
+        train_result = {'Avg acc': avg_acc, 'Avg f1-score': avg_f1, 'Avg loss': avg_loss}
 
         return train_result, model_summary_path
 
-    def evaluate(self, model_summary_path, n_epoch, mode='test'):
+    def evaluate(self, model_summary_path, n_epoch, mode='test', load=False):
         # mode check
         if (mode == 'test') and (self.test_loader is not None):
             loader = self.test_loader
@@ -126,7 +191,8 @@ class NewsGroupTrainer:
             raise ValueError('evaluate mode not found')
         total_step = len(loader)
 
-        self.load_model(model_summary_path)
+        if load is True:
+            self.load_model(model_summary_path)
         self.model1.eval()
         self.model2.eval()
 
@@ -193,10 +259,15 @@ class NewsGroupTrainer:
         log_message += f'F1-score_1: {macro_f1_score_1:.4f}, F1-score_2: {macro_f1_score_2:.4f}'
         logger.info(log_message)
 
-        result = {'Avg acc 1': acc_1, 'Avg f1-score 1': macro_f1_score_1, 'Avg loss 1': avg_loss_1,
-                  'Avg acc 2': acc_2, 'Avg f1-score 2': macro_f1_score_2, 'Avg loss 2': avg_loss_2}
+        if acc_1 > acc_2:
+            avg_acc = acc_1
+            avg_loss = avg_loss_1
+            avg_f1 = 0
+        else:
+            avg_acc = acc_2
+            avg_loss = avg_loss_2
+            avg_f1 = 0
 
-        # model save
-        # model_summary_path = self.save_model(n_epoch, avg_loss, accuracy, macro_f1_score, mode=mode)
+        result = {'Acc': avg_acc, 'f1-score': avg_f1, 'loss': avg_loss}
 
         return result, model_summary_path
