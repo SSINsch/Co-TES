@@ -21,10 +21,7 @@ logging.config.dictConfig(config)
 logger = logging.getLogger(__name__)
 
 
-def main():
-    # argument parsing
-    args = arg_parse()
-
+def main(args):
     # set seed
     torch.manual_seed(args.seed)
     torch.cuda.manual_seed(args.seed)
@@ -90,7 +87,7 @@ def main():
     if args.model1 == 'fcn':
         clf1 = NewsNet(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, hidden_size=args.fcn_opt1)
     elif args.model1 == 'cnn':
-        clf1 = NewsNetCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, kernel_windows=[3,4])
+        clf1 = NewsNetCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
     elif args.model1 == 'lstm':
         clf1 = NewsNetLSTM(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, hidden_size=args.lstm_opt1)
     elif args.model1 == 'vdcnn':
@@ -106,7 +103,7 @@ def main():
     if args.model2 == 'fcn':
         clf2 = NewsNet(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, hidden_size=args.fcn_opt2)
     elif args.model2 == 'cnn':
-        clf2 = NewsNetCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, kernel_windows=[5,6])
+        clf2 = NewsNetCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
     elif args.model2 == 'lstm':
         clf2 = NewsNetLSTM(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, hidden_size=args.lstm_opt2)
     elif args.model2 == 'vdcnn':
@@ -123,9 +120,11 @@ def main():
     logger.info(f'log directory : {save_dir}')
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    now_time = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-    model_str = f'{args.noise_type}_{str(args.noise_rate)}_seed{args.seed}_{now_time}'
+    now_time = datetime.now().strftime('%Y-%m-%d-%H-%M')
+    model_str = f'{args.noise_type}_{str(args.noise_rate)}_seed{args.seed}_{args.model1[0]}{args.model2[0]}_{now_time}'
     writer = SummaryWriter(f'{save_dir}/{model_str}')
+    with open(f'{save_dir}/{model_str}/info.json', "w") as f:
+        json.dump(args.__dict__, f)
 
     # training
     ng_trainer = NewsGroupTrainer(model1=clf1,
@@ -168,5 +167,28 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+
+    args = arg_parse()
+    lst_seed = [1, 2, 3, 4, 5]
+    models = ['fcn', 'cnn', 'lstm']
+    epochs = 100
+
+    lst_hiddens = [50, 100, 300]
+    lst_kernels = [[3, 4, 5], [3, 4], [5, 6]]
+    noise = [('symmetric', 0.2), ('symmetric', 0.5), ('pairflip', 0.45)]
+
+    for m in range(len(models)):
+        for n in range(m, len(models)):
+            for s in lst_seed:
+                args.model_type = 'coteaching_plus'
+                args.dataset = 'news'
+                args.n_epoch = 100
+                args.noise_type = 'symmetric'
+                args.noise_rate = 0.2
+
+                args.seed = s
+                args.model1 = models[m]
+                args.model2 = models[n]
+
+                main(args)
 
