@@ -2,6 +2,8 @@ import os
 import pandas as pd
 import logging
 import json
+import matplotlib
+import matplotlib.pyplot as plt
 from typing import Dict
 from tensorboard.backend.event_processing.event_accumulator import EventAccumulator
 
@@ -87,25 +89,6 @@ class TensorBoardPrinter:
                      target: Dict[str, Dict[str, pd.DataFrame]],
                      filter: Dict = None,
                      output_path: str = None) -> None:
-        # Todo. 작업 진행 중
-        # filter = {noise_type: ~, noise_rate: ~, model1: ~, model2: ~, model에 맞는 opt1: ~, model에 맞는 opt2: ~}
-        if filter is not None:
-            # filter에 맞게 target dictionary 내에 key들만 따로 뽑아서 사용
-            pass
-
-        # setting output path for graph image
-        if self.output_path is not None:
-            path = self.output_path
-        else:
-            path = output_path
-
-        # iterataion 돌면서 결과 df 긁고, step을 x축으로 y축에 도시
-        # ylim, xlim, color, legend 위치, 글씨 크기, 표 제목, 축 이름, 등등 설정
-        # 마지막에 save하고 flush 잊지 말것
-        for _ in target:
-            pass
-            # case acc
-            # case loss
         raise NotImplementedError
 
 
@@ -113,5 +96,4 @@ if __name__ == '__main__':
     p = '../logs/news/coteaching_plus'
     tb_printer = TensorBoardPrinter(root_dir=p)
     res = tb_printer.recursive_run()
-    tb_printer.save_fig_acc(output_path=p)
     print('Done')
