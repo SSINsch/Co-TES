@@ -1,3 +1,4 @@
+import os
 import argparse
 import torch.nn.functional as F
 import logging
@@ -74,3 +75,18 @@ def basic_accuracy(predict, answer) -> float:
 
 def to_np(x):
     return x.detach().cpu().numpy()
+
+
+def get_subdirs(p):
+    ex_folders = []
+    for it in os.scandir(p):
+        if it.is_dir():
+            # it.name or it.path
+            ex_folders.append(it.path)
+
+    return ex_folders
+
+
+if __name__ == '__main__':
+    p = '../logs/news/coteaching_plus/symmetric_0.2_seed4_ll_2022-11-03-19-58'
+    get_subdirs(p)

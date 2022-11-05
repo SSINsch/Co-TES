@@ -170,15 +170,20 @@ if __name__ == '__main__':
 
     args = arg_parse()
     lst_seed = [1, 2, 3, 4, 5]
-    models = ['fcn', 'cnn', 'lstm']
+    # models = ['fcn', 'cnn', 'lstm']
+    models = ['lstm']
     epochs = 100
 
-    lst_hiddens = [50, 100, 300]
+    # lst_hiddens = [50, 100, 300]
+    # Todo. lstm (100, 300) 실험 안했음
+    # Todo. CNN model opt 실험 안했음
+    # Todo. FCN model opt 실험 안했음
+    lst_hiddens = [100, 300]
     lst_kernels = [[3, 4, 5], [3, 4], [5, 6]]
     noise = [('symmetric', 0.2), ('symmetric', 0.5), ('pairflip', 0.45)]
 
-    for m in range(len(models)):
-        for n in range(m, len(models)):
+    for m in range(len(lst_hiddens)):
+        for n in range(m+1, len(lst_hiddens)):
             for s in lst_seed:
                 args.model_type = 'coteaching_plus'
                 args.dataset = 'news'
@@ -187,8 +192,10 @@ if __name__ == '__main__':
                 args.noise_rate = 0.2
 
                 args.seed = s
-                args.model1 = models[m]
-                args.model2 = models[n]
+                args.model1 = 'lstm'
+                args.model2 = 'lstm'
+                args.lstm_opt1 = lst_hiddens[m]
+                args.lstm_opt2 = lst_hiddens[n]
 
                 main(args)
 
