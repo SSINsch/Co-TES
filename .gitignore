@@ -7,3 +7,5 @@ data/glove*
 playground/*.pk
 playground/.vector_cache/*
 output.txt
+data/devign.zip
+data/devign/*
