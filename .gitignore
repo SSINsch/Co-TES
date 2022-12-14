@@ -1,6 +1,6 @@
 .idea/*
 */__pycache__/*
-logs/*
+logs/news/*
 data/news.pkl
 data/news_vocab*
 data/glove*
