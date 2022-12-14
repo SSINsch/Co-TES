@@ -169,33 +169,29 @@ def main(args):
 if __name__ == '__main__':
 
     args = arg_parse()
-    lst_seed = [1, 2, 3, 4, 5]
-    # models = ['fcn', 'cnn', 'lstm']
-    models = ['lstm']
-    epochs = 100
+    #lst_seed = [1, 2, 3, 4, 5]
+    lst_seed = [1, 2, 3]
+    # models = ['cnn', 'lstm', 'fcn']
+    models = ['lstm', 'fcn']
+    # models = ['lstm']
 
     # lst_hiddens = [50, 100, 300]
-    # Todo. lstm (100, 300) 실험 안했음
-    # Todo. CNN model opt 실험 안했음
-    # Todo. FCN model opt 실험 안했음
-    lst_hiddens = [100, 300]
-    lst_kernels = [[3, 4, 5], [3, 4], [5, 6]]
-    noise = [('symmetric', 0.2), ('symmetric', 0.5), ('pairflip', 0.45)]
+    # lst_hiddens = [100, 300]
+    # lst_kernels = [[3, 4, 5], [3, 4], [5, 6]]
+    # noise = [('symmetric', 0.2), ('symmetric', 0.5), ('pairflip', 0.45)]
 
-    for m in range(len(lst_hiddens)):
-        for n in range(m+1, len(lst_hiddens)):
+    for m in range(len(models)):
+        for n in range(m, len(models)):
             for s in lst_seed:
                 args.model_type = 'coteaching_plus'
                 args.dataset = 'news'
-                args.n_epoch = 100
+                args.n_epoch = 50
                 args.noise_type = 'symmetric'
                 args.noise_rate = 0.2
 
                 args.seed = s
-                args.model1 = 'lstm'
-                args.model2 = 'lstm'
-                args.lstm_opt1 = lst_hiddens[m]
-                args.lstm_opt2 = lst_hiddens[n]
+                args.model1 = models[m]
+                args.model2 = models[n]
 
                 main(args)
 

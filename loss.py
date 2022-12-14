@@ -67,6 +67,7 @@ def loss_coteaching_plus(logits, logits2, labels, forget_rate, ind, noise_or_not
     _update_step = np.logical_or(logical_disagree_id, step < 5000).astype(np.float32)
     update_step = Variable(torch.from_numpy(_update_step)).cuda()
 
+    logger.debug(f'\tnumber of disagree id: {len(disagree_id)}/{len(labels)}')
     if len(disagree_id) > 0:    # disagree가 하나라도 있으면 해당되는 요소들만 뽑음
         update_labels = labels[disagree_id]     # label들
         update_outputs = outputs[disagree_id]   # 해당되는 model의 output값

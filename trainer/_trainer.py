@@ -127,6 +127,7 @@ class NewsGroupTrainer:
             acc_2 = to_np(acc_2)
             total_acc_2 += acc_2
 
+            # Todo. 이 아래 Loss 들의 distribution 찍어보기
             # get loss
             if n_epoch < self.init_epoch:
                 loss_1, loss_2, _, _ = loss_coteaching(logits_1, logits_2, labels,

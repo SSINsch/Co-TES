@@ -18,7 +18,7 @@
 			"class": "logging.FileHandler",
 			"level": "DEBUG",
 			"formatter": "basic",
-			"filename": "./logs/debug.log"
+			"filename": "./logs/debug_20221215_alpha.log"
 		}
 	},
 	"root": {
