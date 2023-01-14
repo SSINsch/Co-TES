@@ -172,26 +172,43 @@ if __name__ == '__main__':
     #lst_seed = [1, 2, 3, 4, 5]
     lst_seed = [1, 2, 3]
     # models = ['cnn', 'lstm', 'fcn']
-    models = ['lstm', 'fcn']
-    # models = ['lstm']
+    # models = ['lstm', 'fcn']
+    models = ['lstm']
 
-    # lst_hiddens = [50, 100, 300]
+    lst_hiddens = [50, 100, 300]
     # lst_hiddens = [100, 300]
     # lst_kernels = [[3, 4, 5], [3, 4], [5, 6]]
     # noise = [('symmetric', 0.2), ('symmetric', 0.5), ('pairflip', 0.45)]
 
-    for m in range(len(models)):
-        for n in range(m, len(models)):
+    # for m in range(len(models)):
+    #     for n in range(m, len(models)):
+    #         for s in lst_seed:
+    #             args.model_type = 'coteaching_plus'
+    #             args.dataset = 'news'
+    #             args.n_epoch = 50
+    #             args.noise_type = 'symmetric'
+    #             args.noise_rate = 0.2
+    #
+    #             args.seed = s
+    #             args.model1 = models[m]
+    #             args.model2 = models[n]
+    #
+    #             main(args)
+
+    for m in range(len(lst_hiddens)):
+        for n in range(m, len(lst_hiddens)):
             for s in lst_seed:
                 args.model_type = 'coteaching_plus'
                 args.dataset = 'news'
-                args.n_epoch = 50
+                args.n_epoch = 60
                 args.noise_type = 'symmetric'
                 args.noise_rate = 0.2
 
                 args.seed = s
-                args.model1 = models[m]
-                args.model2 = models[n]
+                args.model1 = 'lstm'
+                args.lstm_opt1 = lst_hiddens[m]
+                args.model2 = 'lstm'
+                args.lstm_opt2 = lst_hiddens[n]
 
                 main(args)
 
