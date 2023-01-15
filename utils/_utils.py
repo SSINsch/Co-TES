@@ -12,10 +12,10 @@ def arg_parse():
     parser.add_argument('--batch_size', type=int, default=128)
     parser.add_argument('--dataset', type=str, help='now only support news dataset', default='news')
     parser.add_argument('--model1', type=str, help='first model type')
-    # Todo. 모델 옵션 추가
     parser.add_argument('--lstm_opt1', type=int, help='first lstm model option', default='300')
     parser.add_argument('--lstm_opt2', type=int, help='second lstm model option', default='300')
-    # parser.add_argument('--cnn_opt1', nargs='+', help='first cnn model option', default='3 4 5')
+    parser.add_argument('--cnn_opt1', nargs='+', help='first cnn model option', default='3 4 5')
+    parser.add_argument('--cnn_opt2', nargs='+', help='second cnn model option', default='3 4 5')
     parser.add_argument('--fcn_opt1', type=int, help='first fcn model option', default='300')
     parser.add_argument('--fcn_opt2', type=int, help='second ccn model option', default='300')
     parser.add_argument('--model2', type=str, help='second model type')
@@ -42,6 +42,12 @@ def arg_parse():
     if args.num_gradual > args.n_epoch:
         logging.warning(f'(num_gradual) should be greater than (n_epoch) : {args.num_gradual}, {args.n_epoch}')
         raise ValueError(f'(num_gradual) should be greater than (n_epoch) : {args.num_gradual}, {args.n_epoch}')
+
+    # check cnn option
+    args.cnn_opt1 = args.cnn_opt1.split()
+    args.cnn_opt1 = list(map(int, args.cnn_opt1))
+    args.cnn_opt2 = args.cnn_opt2.split()
+    args.cnn_opt2 = list(map(int, args.cnn_opt2))
 
     log_m = f'[Args] (seed: {args.seed}), (model1: {args.model1}), '
     log_m += f'(model2: {args.model2}), (noise_rate: {args.noise_rate})'
