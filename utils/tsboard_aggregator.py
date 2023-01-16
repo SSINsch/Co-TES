@@ -49,14 +49,16 @@ class TensorBoardPrinter:
             f_json = os.path.join(ex, 'info.json')
             with open(f_json) as f:
                 run_params = json.load(f)
+
             opt1 = '_'.join([run_params['model1'], 'opt1'])
             opt2 = '_'.join([run_params['model2'], 'opt2'])
 
-            # Todo. cnn 모델 옵션 추가에 따른 코드 수정 필요
             if 'cnn' in opt1:
-                run_params[opt1] = '345'
+                run_params[opt1] = list(map(str, run_params[opt1]))
+                run_params[opt1] = ''.join(run_params[opt1])
             if 'cnn' in opt2:
-                run_params[opt2] = '345'
+                run_params[opt2] = list(map(str, run_params[opt2]))
+                run_params[opt2] = ''.join(run_params[opt2])
 
             # dictionary key name 생성
             name = [run_params['seed'], run_params['noise_type'], run_params['noise_rate'], run_params['model1'],
@@ -93,7 +95,7 @@ class TensorBoardPrinter:
 
 
 if __name__ == '__main__':
-    p = '../logs/news/coteaching_plus'
+    p = '../logs/news/coteaching_plus/test'
     tb_printer = TensorBoardPrinter(root_dir=p)
     res = tb_printer.recursive_run()
     print('Done')
