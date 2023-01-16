@@ -87,7 +87,7 @@ def main(args):
     if args.model1 == 'fcn':
         clf1 = NewsNet(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, hidden_size=args.fcn_opt1)
     elif args.model1 == 'cnn':
-        clf1 = NewsNetCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
+        clf1 = NewsNetCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, kernel_windows=args.cnn_opt1)
     elif args.model1 == 'lstm':
         clf1 = NewsNetLSTM(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, hidden_size=args.lstm_opt1)
     elif args.model1 == 'vdcnn':
@@ -103,7 +103,7 @@ def main(args):
     if args.model2 == 'fcn':
         clf2 = NewsNet(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, hidden_size=args.fcn_opt2)
     elif args.model2 == 'cnn':
-        clf2 = NewsNetCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes)
+        clf2 = NewsNetCNN(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, kernel_windows=args.cnn_opt2)
     elif args.model2 == 'lstm':
         clf2 = NewsNetLSTM(weights_matrix=train_dataset.weights_matrix, num_classes=num_classes, hidden_size=args.lstm_opt2)
     elif args.model2 == 'vdcnn':
@@ -169,15 +169,15 @@ def main(args):
 if __name__ == '__main__':
 
     args = arg_parse()
-    #lst_seed = [1, 2, 3, 4, 5]
-    lst_seed = [1, 2, 3]
+    lst_seed = [1, 2, 3, 4, 5]
     # models = ['cnn', 'lstm', 'fcn']
     # models = ['lstm', 'fcn']
-    models = ['lstm']
+    # models = ['lstm']
+    models = ['cnn']
 
-    lst_hiddens = [50, 100, 300]
+    # lst_hiddens = [50, 100, 300]
     # lst_hiddens = [100, 300]
-    # lst_kernels = [[3, 4, 5], [3, 4], [5, 6]]
+    lst_kernels = [[3, 4], [5, 6], [3, 4, 5]]
     # noise = [('symmetric', 0.2), ('symmetric', 0.5), ('pairflip', 0.45)]
 
     # for m in range(len(models)):
@@ -194,21 +194,38 @@ if __name__ == '__main__':
     #             args.model2 = models[n]
     #
     #             main(args)
+    #
+    # for m in range(len(lst_hiddens)):
+    #     for n in range(m, len(lst_hiddens)):
+    #         for s in lst_seed:
+    #             args.model_type = 'coteaching_plus'
+    #             args.dataset = 'news'
+    #             args.n_epoch = 60
+    #             args.noise_type = 'symmetric'
+    #             args.noise_rate = 0.2
+    #
+    #             args.seed = s
+    #             args.model1 = 'lstm'
+    #             args.lstm_opt1 = lst_hiddens[m]
+    #             args.model2 = 'lstm'
+    #             args.lstm_opt2 = lst_hiddens[n]
+    #
+    #             main(args)
 
-    for m in range(len(lst_hiddens)):
-        for n in range(m, len(lst_hiddens)):
+    for m in range(len(lst_kernels)):
+        for n in range(m, len(lst_kernels)):
             for s in lst_seed:
                 args.model_type = 'coteaching_plus'
                 args.dataset = 'news'
-                args.n_epoch = 60
+                # args.n_epoch = 100
+                args.n_epoch = 100
                 args.noise_type = 'symmetric'
                 args.noise_rate = 0.2
 
                 args.seed = s
-                args.model1 = 'lstm'
-                args.lstm_opt1 = lst_hiddens[m]
-                args.model2 = 'lstm'
-                args.lstm_opt2 = lst_hiddens[n]
+                args.model1 = 'cnn'
+                args.cnn_opt1 = lst_kernels[m]
+                args.model2 = 'cnn'
+                args.cnn_opt2 = lst_kernels[n]
 
                 main(args)
-
