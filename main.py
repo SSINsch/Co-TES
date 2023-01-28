@@ -216,6 +216,8 @@ if __name__ == '__main__':
         for n in range(m, len(lst_kernels)):
             for s in lst_seed:
                 args.model_type = 'coteaching_plus'
+                if (m == 0) and (n < 2):
+                    continue
                 args.dataset = 'news'
                 # args.n_epoch = 100
                 args.n_epoch = 100
