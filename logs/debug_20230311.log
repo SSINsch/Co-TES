@@ -1,0 +1,245 @@
+2023-03-11 23:32:43 - utils._utils - DEBUG - [Args] (seed: 1), (model1: None), (model2: None), (noise_rate: 0.2)
+2023-03-11 23:32:46 - data.newsgroups - INFO - regrouped label (19997,)
+2023-03-11 23:32:46 - utils._noise - DEBUG - 6, 7
+2023-03-11 23:32:46 - utils._noise - DEBUG - 13997
+2023-03-11 23:32:46 - utils._noise - INFO - Actual noise 0.20
+2023-03-11 23:32:46 - utils._noise - DEBUG - [[0.8        0.03333333 0.03333333 0.03333333 0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.8        0.03333333 0.03333333 0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.8        0.03333333 0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.8        0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.03333333 0.8        0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.03333333 0.03333333 0.8
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.03333333 0.03333333 0.03333333
+  0.8       ]]
+2023-03-11 23:32:46 - data.newsgroups - INFO - label precision: 0.8033149960705865
+2023-03-11 23:32:48 - data.newsgroups - INFO - regrouped label (19997,)
+2023-03-11 23:32:48 - __main__ - INFO - Loading dataset...
+2023-03-11 23:32:48 - __main__ - INFO - Building model...
+2023-03-11 23:32:50 - __main__ - INFO - <bound method Module.parameters of NewsNetCNN(
+  (embedding): Embedding(20000, 300)
+  (convs): ModuleList(
+    (0): Conv2d(1, 300, kernel_size=(3, 300), stride=(1, 1))
+    (1): Conv2d(1, 300, kernel_size=(4, 300), stride=(1, 1))
+    (2): Conv2d(1, 300, kernel_size=(5, 300), stride=(1, 1))
+  )
+  (dropout): Dropout(p=0.25, inplace=False)
+  (linear): Linear(in_features=900, out_features=7, bias=True)
+)>
+2023-03-11 23:32:50 - __main__ - INFO - model parameters(trainable/all): 7087207 / 7087207
+2023-03-11 23:32:50 - __main__ - INFO - <bound method Module.parameters of NewsNetCNN(
+  (embedding): Embedding(20000, 300)
+  (convs): ModuleList(
+    (0): Conv2d(1, 300, kernel_size=(3, 300), stride=(1, 1))
+    (1): Conv2d(1, 300, kernel_size=(4, 300), stride=(1, 1))
+    (2): Conv2d(1, 300, kernel_size=(5, 300), stride=(1, 1))
+  )
+  (dropout): Dropout(p=0.25, inplace=False)
+  (linear): Linear(in_features=900, out_features=7, bias=True)
+)>
+2023-03-11 23:32:50 - __main__ - INFO - model parameters(trainable/all): 7087207 / 7087207
+2023-03-11 23:32:52 - data.newsgroups - INFO - regrouped label (19997,)
+2023-03-11 23:32:52 - utils._noise - DEBUG - 6, 7
+2023-03-11 23:32:52 - utils._noise - DEBUG - 13997
+2023-03-11 23:32:52 - utils._noise - INFO - Actual noise 0.20
+2023-03-11 23:32:52 - utils._noise - DEBUG - [[0.8        0.03333333 0.03333333 0.03333333 0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.8        0.03333333 0.03333333 0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.8        0.03333333 0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.8        0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.03333333 0.8        0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.03333333 0.03333333 0.8
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.03333333 0.03333333 0.03333333
+  0.8       ]]
+2023-03-11 23:32:52 - data.newsgroups - INFO - label precision: 0.8033149960705865
+2023-03-11 23:32:54 - data.newsgroups - INFO - regrouped label (19997,)
+2023-03-11 23:32:54 - __main__ - INFO - Loading dataset...
+2023-03-11 23:32:54 - __main__ - INFO - Building model...
+2023-03-11 23:32:54 - __main__ - INFO - <bound method Module.parameters of NewsNetCNN(
+  (embedding): Embedding(20000, 300)
+  (convs): ModuleList(
+    (0): Conv2d(1, 300, kernel_size=(3, 300), stride=(1, 1))
+    (1): Conv2d(1, 300, kernel_size=(4, 300), stride=(1, 1))
+    (2): Conv2d(1, 300, kernel_size=(5, 300), stride=(1, 1))
+  )
+  (dropout): Dropout(p=0.25, inplace=False)
+  (linear): Linear(in_features=900, out_features=7, bias=True)
+)>
+2023-03-11 23:32:54 - __main__ - INFO - model parameters(trainable/all): 7087207 / 7087207
+2023-03-11 23:32:55 - __main__ - INFO - <bound method Module.parameters of NewsNetLSTM(
+  (embedding): Embedding(20000, 300)
+  (bi_lstm): LSTM(300, 300, batch_first=True, bidirectional=True)
+  (linear): Linear(in_features=600, out_features=7, bias=True)
+)>
+2023-03-11 23:32:55 - __main__ - INFO - model parameters(trainable/all): 7449007 / 7449007
+2023-03-11 23:32:57 - data.newsgroups - INFO - regrouped label (19997,)
+2023-03-11 23:32:57 - utils._noise - DEBUG - 6, 7
+2023-03-11 23:32:57 - utils._noise - DEBUG - 13997
+2023-03-11 23:32:57 - utils._noise - INFO - Actual noise 0.20
+2023-03-11 23:32:57 - utils._noise - DEBUG - [[0.8        0.03333333 0.03333333 0.03333333 0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.8        0.03333333 0.03333333 0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.8        0.03333333 0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.8        0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.03333333 0.8        0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.03333333 0.03333333 0.8
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.03333333 0.03333333 0.03333333
+  0.8       ]]
+2023-03-11 23:32:57 - data.newsgroups - INFO - label precision: 0.8033149960705865
+2023-03-11 23:32:59 - data.newsgroups - INFO - regrouped label (19997,)
+2023-03-11 23:32:59 - __main__ - INFO - Loading dataset...
+2023-03-11 23:32:59 - __main__ - INFO - Building model...
+2023-03-11 23:32:59 - __main__ - INFO - <bound method Module.parameters of NewsNetCNN(
+  (embedding): Embedding(20000, 300)
+  (convs): ModuleList(
+    (0): Conv2d(1, 300, kernel_size=(3, 300), stride=(1, 1))
+    (1): Conv2d(1, 300, kernel_size=(4, 300), stride=(1, 1))
+    (2): Conv2d(1, 300, kernel_size=(5, 300), stride=(1, 1))
+  )
+  (dropout): Dropout(p=0.25, inplace=False)
+  (linear): Linear(in_features=900, out_features=7, bias=True)
+)>
+2023-03-11 23:32:59 - __main__ - INFO - model parameters(trainable/all): 7087207 / 7087207
+2023-03-11 23:32:59 - __main__ - INFO - <bound method Module.parameters of NewsNet(
+  (embedding): Embedding(20000, 300)
+  (avgpool): AdaptiveAvgPool1d(output_size=4800)
+  (fc1): Linear(in_features=4800, out_features=1200, bias=True)
+  (bn1): BatchNorm1d(1200, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (ac): Softsign()
+  (fc2): Linear(in_features=1200, out_features=300, bias=True)
+  (bn2): BatchNorm1d(300, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (fc3): Linear(in_features=300, out_features=7, bias=True)
+)>
+2023-03-11 23:32:59 - __main__ - INFO - model parameters(trainable/all): 12126607 / 12126607
+2023-03-11 23:33:01 - data.newsgroups - INFO - regrouped label (19997,)
+2023-03-11 23:33:01 - utils._noise - DEBUG - 6, 7
+2023-03-11 23:33:01 - utils._noise - DEBUG - 13997
+2023-03-11 23:33:02 - utils._noise - INFO - Actual noise 0.20
+2023-03-11 23:33:02 - utils._noise - DEBUG - [[0.8        0.03333333 0.03333333 0.03333333 0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.8        0.03333333 0.03333333 0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.8        0.03333333 0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.8        0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.03333333 0.8        0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.03333333 0.03333333 0.8
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.03333333 0.03333333 0.03333333
+  0.8       ]]
+2023-03-11 23:33:02 - data.newsgroups - INFO - label precision: 0.8033149960705865
+2023-03-11 23:33:04 - data.newsgroups - INFO - regrouped label (19997,)
+2023-03-11 23:33:04 - __main__ - INFO - Loading dataset...
+2023-03-11 23:33:04 - __main__ - INFO - Building model...
+2023-03-11 23:33:04 - __main__ - INFO - <bound method Module.parameters of NewsNetLSTM(
+  (embedding): Embedding(20000, 300)
+  (bi_lstm): LSTM(300, 300, batch_first=True, bidirectional=True)
+  (linear): Linear(in_features=600, out_features=7, bias=True)
+)>
+2023-03-11 23:33:04 - __main__ - INFO - model parameters(trainable/all): 7449007 / 7449007
+2023-03-11 23:33:04 - __main__ - INFO - <bound method Module.parameters of NewsNetLSTM(
+  (embedding): Embedding(20000, 300)
+  (bi_lstm): LSTM(300, 300, batch_first=True, bidirectional=True)
+  (linear): Linear(in_features=600, out_features=7, bias=True)
+)>
+2023-03-11 23:33:04 - __main__ - INFO - model parameters(trainable/all): 7449007 / 7449007
+2023-03-11 23:33:06 - data.newsgroups - INFO - regrouped label (19997,)
+2023-03-11 23:33:06 - utils._noise - DEBUG - 6, 7
+2023-03-11 23:33:06 - utils._noise - DEBUG - 13997
+2023-03-11 23:33:06 - utils._noise - INFO - Actual noise 0.20
+2023-03-11 23:33:06 - utils._noise - DEBUG - [[0.8        0.03333333 0.03333333 0.03333333 0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.8        0.03333333 0.03333333 0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.8        0.03333333 0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.8        0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.03333333 0.8        0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.03333333 0.03333333 0.8
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.03333333 0.03333333 0.03333333
+  0.8       ]]
+2023-03-11 23:33:06 - data.newsgroups - INFO - label precision: 0.8033149960705865
+2023-03-11 23:33:08 - data.newsgroups - INFO - regrouped label (19997,)
+2023-03-11 23:33:08 - __main__ - INFO - Loading dataset...
+2023-03-11 23:33:08 - __main__ - INFO - Building model...
+2023-03-11 23:33:08 - __main__ - INFO - <bound method Module.parameters of NewsNetLSTM(
+  (embedding): Embedding(20000, 300)
+  (bi_lstm): LSTM(300, 300, batch_first=True, bidirectional=True)
+  (linear): Linear(in_features=600, out_features=7, bias=True)
+)>
+2023-03-11 23:33:08 - __main__ - INFO - model parameters(trainable/all): 7449007 / 7449007
+2023-03-11 23:33:08 - __main__ - INFO - <bound method Module.parameters of NewsNet(
+  (embedding): Embedding(20000, 300)
+  (avgpool): AdaptiveAvgPool1d(output_size=4800)
+  (fc1): Linear(in_features=4800, out_features=1200, bias=True)
+  (bn1): BatchNorm1d(1200, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (ac): Softsign()
+  (fc2): Linear(in_features=1200, out_features=300, bias=True)
+  (bn2): BatchNorm1d(300, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (fc3): Linear(in_features=300, out_features=7, bias=True)
+)>
+2023-03-11 23:33:08 - __main__ - INFO - model parameters(trainable/all): 12126607 / 12126607
+2023-03-11 23:33:10 - data.newsgroups - INFO - regrouped label (19997,)
+2023-03-11 23:33:10 - utils._noise - DEBUG - 6, 7
+2023-03-11 23:33:10 - utils._noise - DEBUG - 13997
+2023-03-11 23:33:10 - utils._noise - INFO - Actual noise 0.20
+2023-03-11 23:33:10 - utils._noise - DEBUG - [[0.8        0.03333333 0.03333333 0.03333333 0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.8        0.03333333 0.03333333 0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.8        0.03333333 0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.8        0.03333333 0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.03333333 0.8        0.03333333
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.03333333 0.03333333 0.8
+  0.03333333]
+ [0.03333333 0.03333333 0.03333333 0.03333333 0.03333333 0.03333333
+  0.8       ]]
+2023-03-11 23:33:10 - data.newsgroups - INFO - label precision: 0.8033149960705865
+2023-03-11 23:33:12 - data.newsgroups - INFO - regrouped label (19997,)
+2023-03-11 23:33:12 - __main__ - INFO - Loading dataset...
+2023-03-11 23:33:12 - __main__ - INFO - Building model...
+2023-03-11 23:33:12 - __main__ - INFO - <bound method Module.parameters of NewsNet(
+  (embedding): Embedding(20000, 300)
+  (avgpool): AdaptiveAvgPool1d(output_size=4800)
+  (fc1): Linear(in_features=4800, out_features=1200, bias=True)
+  (bn1): BatchNorm1d(1200, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (ac): Softsign()
+  (fc2): Linear(in_features=1200, out_features=300, bias=True)
+  (bn2): BatchNorm1d(300, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (fc3): Linear(in_features=300, out_features=7, bias=True)
+)>
+2023-03-11 23:33:12 - __main__ - INFO - model parameters(trainable/all): 12126607 / 12126607
+2023-03-11 23:33:12 - __main__ - INFO - <bound method Module.parameters of NewsNet(
+  (embedding): Embedding(20000, 300)
+  (avgpool): AdaptiveAvgPool1d(output_size=4800)
+  (fc1): Linear(in_features=4800, out_features=1200, bias=True)
+  (bn1): BatchNorm1d(1200, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (ac): Softsign()
+  (fc2): Linear(in_features=1200, out_features=300, bias=True)
+  (bn2): BatchNorm1d(300, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (fc3): Linear(in_features=300, out_features=7, bias=True)
+)>
+2023-03-11 23:33:12 - __main__ - INFO - model parameters(trainable/all): 12126607 / 12126607

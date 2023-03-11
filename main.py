@@ -20,6 +20,16 @@ logging.config.dictConfig(config)
 
 logger = logging.getLogger(__name__)
 
+# Note. init epoch 로 co-teaching, co-teachin+ 조절 중
+# INIT_EPOCH = 200
+
+
+def count_parameters(model, trainable=False):
+    if trainable is True:
+        return sum(p.numel() for p in model.parameters() if p.requires_grad)
+    else:
+        return sum(p.numel() for p in model.parameters())
+
 
 def main(args):
     # set seed
@@ -97,6 +107,7 @@ def main(args):
 
     clf1.cuda()
     logger.info(clf1.parameters)
+    logger.info(f'model parameters(trainable/all): {count_parameters(clf1, trainable=True)} / {count_parameters(clf1)}')
     optimizer1 = torch.optim.Adam(clf1.parameters(), lr=learning_rate)
 
     # build model 2
@@ -113,6 +124,7 @@ def main(args):
 
     clf2.cuda()
     logger.info(clf2.parameters)
+    logger.info(f'model parameters(trainable/all): {count_parameters(clf2, trainable=True)} / {count_parameters(clf2)}')
     optimizer2 = torch.optim.Adam(clf2.parameters(), lr=learning_rate)
 
     # set result folder and file
@@ -169,38 +181,43 @@ def main(args):
 if __name__ == '__main__':
 
     args = arg_parse()
-    lst_seed = [1, 2, 3, 4, 5]
-    # models = ['cnn', 'lstm', 'fcn']
+    # lst_seed = [1, 2, 3, 4, 5]
+    # lst_seed = [1, 2, 3]
+    lst_seed = [1]
+    models = ['cnn', 'lstm', 'fcn']
     # models = ['lstm', 'fcn']
     # models = ['lstm']
-    models = ['cnn']
+    # models = ['cnn']
 
     # lst_hiddens = [50, 100, 300]
     # lst_hiddens = [100, 300]
-    lst_kernels = [[3, 4], [5, 6], [3, 4, 5]]
+    # lst_kernels = [[3, 4], [5, 6], [3, 4, 5]]
     # noise = [('symmetric', 0.2), ('symmetric', 0.5), ('pairflip', 0.45)]
 
-    # for m in range(len(models)):
-    #     for n in range(m, len(models)):
-    #         for s in lst_seed:
-    #             args.model_type = 'coteaching_plus'
-    #             args.dataset = 'news'
-    #             args.n_epoch = 50
-    #             args.noise_type = 'symmetric'
-    #             args.noise_rate = 0.2
-    #
-    #             args.seed = s
-    #             args.model1 = models[m]
-    #             args.model2 = models[n]
-    #
-    #             main(args)
-    #
+    # Something
+    for m in range(len(models)):
+        for n in range(m, len(models)):
+            for s in lst_seed:
+                args.model_type = 'coteaching_plus'
+                # args.model_type = 'coteaching'
+                args.dataset = 'news'
+                args.n_epoch = 100
+                args.noise_type = 'symmetric'
+                args.noise_rate = 0.2
+
+                args.seed = s
+                args.model1 = models[m]
+                args.model2 = models[n]
+
+                main(args)
+
+    ## Something
     # for m in range(len(lst_hiddens)):
     #     for n in range(m, len(lst_hiddens)):
     #         for s in lst_seed:
     #             args.model_type = 'coteaching_plus'
     #             args.dataset = 'news'
-    #             args.n_epoch = 60
+    #             args.n_epoch = 100
     #             args.noise_type = 'symmetric'
     #             args.noise_rate = 0.2
     #
@@ -212,22 +229,24 @@ if __name__ == '__main__':
     #
     #             main(args)
 
-    for m in range(len(lst_kernels)):
-        for n in range(m, len(lst_kernels)):
-            for s in lst_seed:
-                args.model_type = 'coteaching_plus'
-                if (m == 0) and (n < 2):
-                    continue
-                args.dataset = 'news'
-                # args.n_epoch = 100
-                args.n_epoch = 100
-                args.noise_type = 'symmetric'
-                args.noise_rate = 0.2
 
-                args.seed = s
-                args.model1 = 'cnn'
-                args.cnn_opt1 = lst_kernels[m]
-                args.model2 = 'cnn'
-                args.cnn_opt2 = lst_kernels[n]
-
-                main(args)
+    ## Something
+    # for m in range(len(lst_kernels)):
+    #     for n in range(m, len(lst_kernels)):
+    #         for s in lst_seed:
+    #             args.model_type = 'coteaching_plus'
+    #             if (m == 0) and (n < 2):
+    #                 continue
+    #             args.dataset = 'news'
+    #             # args.n_epoch = 100
+    #             args.n_epoch = 100
+    #             args.noise_type = 'symmetric'
+    #             args.noise_rate = 0.2
+    #
+    #             args.seed = s
+    #             args.model1 = 'cnn'
+    #             args.cnn_opt1 = lst_kernels[m]
+    #             args.model2 = 'cnn'
+    #             args.cnn_opt2 = lst_kernels[n]
+    #
+    #             main(args)

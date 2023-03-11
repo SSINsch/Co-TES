@@ -138,6 +138,10 @@ class NewsGroupTrainer:
                     loss_1, loss_2, _, _ = loss_coteaching_plus(logits_1, logits_2, labels,
                                                                 self.rate_schedule[n_epoch], ind,
                                                                 self.noise_or_not, n_epoch * step)
+                elif self.model_type == 'coteaching':
+                    loss_1, loss_2, _, _ = loss_coteaching(logits_1, logits_2, labels,
+                                                           self.rate_schedule[n_epoch], ind,
+                                                           self.noise_or_not)
                 else:
                     raise Exception('Init Epoch is something wrong...')
 
@@ -224,6 +228,10 @@ class NewsGroupTrainer:
                         loss_1, loss_2, _, _ = loss_coteaching_plus(logits_1, logits_2, labels,
                                                                     self.rate_schedule[n_epoch], ind,
                                                                     self.noise_or_not, n_epoch * step)
+                    elif self.model_type == 'coteaching':
+                        loss_1, loss_2, _, _ = loss_coteaching(logits_1, logits_2, labels,
+                                                               self.rate_schedule[n_epoch], ind,
+                                                               self.noise_or_not)
                     else:
                         loss_1, loss_2 = None, None
                         raise Exception('Init Epoch is something wrong...')
