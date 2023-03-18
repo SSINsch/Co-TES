@@ -36,6 +36,7 @@ def arg_parse():
     parser.add_argument('--epoch_decay_start', type=int, default=80)
     parser.add_argument('--model_type', type=str, help='[coteaching, coteaching_plus]', default='coteaching_plus')
     parser.add_argument('--fr_type', type=str, help='forget rate type', default='type_1')
+    parser.add_argument('--init_epoch', type=int, help='co-teaching => co-teaching+ epoch line', default=0)
 
     args = parser.parse_args()
 

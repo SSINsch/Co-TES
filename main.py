@@ -60,7 +60,7 @@ def main(args):
 
     # load dataset
     if args.dataset == 'news':
-        init_epoch = 0
+        init_epoch = args.init_epoch
         train_dataset = NewsGroups(root='./data/',
                                    train=True,
                                    transform=transforms.ToTensor(),
@@ -183,7 +183,7 @@ if __name__ == '__main__':
     args = arg_parse()
     # lst_seed = [1, 2, 3, 4, 5]
     # lst_seed = [1, 2, 3]
-    lst_seed = [1]
+    lst_seed = [3]
     models = ['cnn', 'lstm', 'fcn']
     # models = ['lstm', 'fcn']
     # models = ['lstm']
@@ -204,6 +204,7 @@ if __name__ == '__main__':
                 args.n_epoch = 100
                 args.noise_type = 'symmetric'
                 args.noise_rate = 0.2
+                args.init_epoch = 0
 
                 args.seed = s
                 args.model1 = models[m]
