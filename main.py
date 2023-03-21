@@ -182,8 +182,8 @@ if __name__ == '__main__':
 
     args = arg_parse()
     # lst_seed = [1, 2, 3, 4, 5]
-    # lst_seed = [1, 2, 3]
-    lst_seed = [3]
+    lst_seed = [1, 2, 3]
+    # lst_seed = [3, 2, 1]
     models = ['cnn', 'lstm', 'fcn']
     # models = ['lstm', 'fcn']
     # models = ['lstm']
@@ -195,13 +195,13 @@ if __name__ == '__main__':
     # noise = [('symmetric', 0.2), ('symmetric', 0.5), ('pairflip', 0.45)]
 
     # Something
-    for m in range(len(models)):
-        for n in range(m, len(models)):
-            for s in lst_seed:
+    for s in lst_seed:
+        for m in range(len(models)):
+            for n in range(m, len(models)):
                 args.model_type = 'coteaching_plus'
                 # args.model_type = 'coteaching'
                 args.dataset = 'news'
-                args.n_epoch = 100
+                args.n_epoch = 200
                 args.noise_type = 'symmetric'
                 args.noise_rate = 0.2
                 args.init_epoch = 0
