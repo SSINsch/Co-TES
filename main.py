@@ -108,6 +108,12 @@ def main(args):
     clf1.cuda()
     logger.info(clf1.parameters)
     logger.info(f'model parameters(trainable/all): {count_parameters(clf1, trainable=True)} / {count_parameters(clf1)}')
+
+    # for name, param in clf1.named_parameters():
+    #     weight1 = param.detach().cpu().numpy()
+    #     l2norm = param.data.norm(dim=1, p=2)
+    #     print(f'{name}: {l2norm}')
+
     optimizer1 = torch.optim.Adam(clf1.parameters(), lr=learning_rate)
 
     # build model 2
@@ -182,7 +188,9 @@ if __name__ == '__main__':
 
     args = arg_parse()
     # lst_seed = [1, 2, 3, 4, 5]
-    lst_seed = [1, 2, 3]
+    lst_seed = [1]
+    # lst_seed = [2, 3]
+    # lst_seed = [2]
     # lst_seed = [3, 2, 1]
     models = ['cnn', 'lstm', 'fcn']
     # models = ['lstm', 'fcn']
@@ -194,23 +202,49 @@ if __name__ == '__main__':
     # lst_kernels = [[3, 4], [5, 6], [3, 4, 5]]
     # noise = [('symmetric', 0.2), ('symmetric', 0.5), ('pairflip', 0.45)]
 
-    # Something
+    # # major ex
+    # for s in lst_seed:
+    #     for m in range(len(models)):
+    #         for n in range(m, len(models)):
+    #             args.model_type = 'coteaching_plus'
+    #             # args.model_type = 'coteaching'
+    #             args.dataset = 'news'
+    #             args.n_epoch = 200
+    #             args.noise_type = 'symmetric'
+    #             args.noise_rate = 0.2
+    #
+    #             # Todo. init_epoch
+    #             args.init_epoch = 0
+    #             # args.init_epoch = 20
+    #
+    #             args.seed = s
+    #             # args.model1 = models[m]
+    #             # args.model2 = models[n]
+    #             args.fcn_opt2 = 1500
+    #
+    #             main(args)
+
+    # cnn - fcn ~(50, 300, 1500)
+    # fcn_lst_hiddens = [1500, 300, 50]
+    lstm_lst_hiddens = [400, 300, 50]
     for s in lst_seed:
-        for m in range(len(models)):
-            for n in range(m, len(models)):
-                args.model_type = 'coteaching_plus'
-                # args.model_type = 'coteaching'
-                args.dataset = 'news'
-                args.n_epoch = 200
-                args.noise_type = 'symmetric'
-                args.noise_rate = 0.2
-                args.init_epoch = 0
+        for n in range(len(lstm_lst_hiddens)):
+            args.model_type = 'coteaching_plus'
+            # args.model_type = 'coteaching'
+            args.dataset = 'news'
+            args.n_epoch = 200
+            args.noise_type = 'symmetric'
+            args.noise_rate = 0.2
+            args.init_epoch = 0
 
-                args.seed = s
-                args.model1 = models[m]
-                args.model2 = models[n]
+            args.seed = s
+            args.model1 = 'cnn'
+            # args.model2 = 'fcn'
+            # args.fcn_opt2 = fcn_lst_hiddens[n]
+            args.model2 = 'lstm'
+            args.lstm_opt2 = lstm_lst_hiddens[n]
 
-                main(args)
+            main(args)
 
     ## Something
     # for m in range(len(lst_hiddens)):
