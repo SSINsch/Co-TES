@@ -184,104 +184,136 @@ def main(args):
     writer.close()
 
 
-if __name__ == '__main__':
+def ex_major_other_models(args):
+    args.model_type = 'coteaching_plus'
+    args.dataset = 'news'
+    args.n_epoch = 200
+    args.noise_type = 'symmetric'
+    args.noise_rate = 0.2
+    args.init_epoch = 0
 
-    args = arg_parse()
-    # lst_seed = [1, 2, 3, 4, 5]
-    lst_seed = [1]
-    # lst_seed = [2, 3]
-    # lst_seed = [2]
-    # lst_seed = [3, 2, 1]
+    lst_seed = [1, 2, 3]
     models = ['cnn', 'lstm', 'fcn']
-    # models = ['lstm', 'fcn']
-    # models = ['lstm']
-    # models = ['cnn']
 
-    # lst_hiddens = [50, 100, 300]
-    # lst_hiddens = [100, 300]
-    # lst_kernels = [[3, 4], [5, 6], [3, 4, 5]]
-    # noise = [('symmetric', 0.2), ('symmetric', 0.5), ('pairflip', 0.45)]
+    for s in lst_seed:
+        for m in range(len(models)):
+            for n in range(m, len(models)):
+                args.seed = s
+                args.model1 = models[m]
+                args.model2 = models[n]
 
-    # # major ex
-    # for s in lst_seed:
-    #     for m in range(len(models)):
-    #         for n in range(m, len(models)):
-    #             args.model_type = 'coteaching_plus'
-    #             # args.model_type = 'coteaching'
-    #             args.dataset = 'news'
-    #             args.n_epoch = 200
-    #             args.noise_type = 'symmetric'
-    #             args.noise_rate = 0.2
-    #
-    #             # Todo. init_epoch
-    #             args.init_epoch = 0
-    #             # args.init_epoch = 20
-    #
-    #             args.seed = s
-    #             # args.model1 = models[m]
-    #             # args.model2 = models[n]
-    #             args.fcn_opt2 = 1500
-    #
-    #             main(args)
+                main(args)
 
-    # cnn - fcn ~(50, 300, 1500)
-    # fcn_lst_hiddens = [1500, 300, 50]
-    lstm_lst_hiddens = [400, 300, 50]
+
+def ex_major_other_models_initepoch(args):
+    args.model_type = 'coteaching_plus'
+    args.dataset = 'news'
+    args.n_epoch = 200
+    args.noise_type = 'symmetric'
+    args.noise_rate = 0.2
+    args.init_epoch = 20
+
+    lst_seed = [1, 2, 3]
+    models = ['cnn', 'lstm', 'fcn']
+
+    for s in lst_seed:
+        for m in range(len(models)):
+            for n in range(m, len(models)):
+                args.seed = s
+                args.model1 = models[m]
+                args.model2 = models[n]
+
+                main(args)
+
+
+def ex_lstm_hidden(args):
+    args.model_type = 'coteaching_plus'
+    args.dataset = 'news'
+    args.n_epoch = 200
+    args.noise_type = 'symmetric'
+    args.noise_rate = 0.2
+    args.model1 = 'lstm'
+    args.model2 = 'lstm'
+
+    lst_seed = [1, 2, 3]
+    lst_hiddens = [50, 100, 300]
+
+    for s in lst_seed:
+        for m in range(len(lst_hiddens)):
+            for n in range(m, len(lst_hiddens)):
+                args.seed = s
+                args.lstm_opt1 = lst_hiddens[m]
+                args.lstm_opt2 = lst_hiddens[n]
+
+                main(args)
+
+def ex_cnn_kernel(args):
+    args.dataset = 'news'
+    args.n_epoch = 200
+    args.noise_type = 'symmetric'
+    args.noise_rate = 0.2
+    args.model1 = 'cnn'
+    args.model2 = 'cnn'
+
+    lst_seed = [1, 2, 3]
+    lst_kernels = [[3, 4], [5, 6], [3, 4, 5]]
+
+    for m in range(len(lst_kernels)):
+        for n in range(m, len(lst_kernels)):
+            for s in lst_seed:
+                args.model_type = 'coteaching_plus'
+                args.seed = s
+                args.cnn_opt1 = lst_kernels[m]
+                args.cnn_opt2 = lst_kernels[n]
+
+                main(args)
+
+
+def ex_cnn_fcn_hidden(args):
+    args.dataset = 'news'
+    args.n_epoch = 200
+    args.noise_type = 'symmetric'
+    args.noise_rate = 0.2
+    args.model1 = 'cnn'
+    args.model2 = 'fcn'
+    args.model_type = 'coteaching_plus'
+    args.init_epoch = 0
+
+    lst_seed = [1, 2, 3]
+    fcn_lst_hiddens = [1500, 300, 50]
+
+    for s in lst_seed:
+        for n in range(len(fcn_lst_hiddens)):
+            args.seed = s
+            args.fcn_opt2 = fcn_lst_hiddens[n]
+
+            main(args)
+
+
+def ex_cnn_lstm_hidden(args):
+    args.dataset = 'news'
+    args.n_epoch = 200
+    args.noise_type = 'symmetric'
+    args.noise_rate = 0.2
+    args.model1 = 'cnn'
+    args.model2 = 'lstm'
+    args.model_type = 'coteaching_plus'
+    args.init_epoch = 0
+
+    args.batch_size = 64
+    lst_seed = [1]
+    lstm_lst_hiddens = [800]
+
     for s in lst_seed:
         for n in range(len(lstm_lst_hiddens)):
-            args.model_type = 'coteaching_plus'
-            # args.model_type = 'coteaching'
-            args.dataset = 'news'
-            args.n_epoch = 200
-            args.noise_type = 'symmetric'
-            args.noise_rate = 0.2
-            args.init_epoch = 0
-
             args.seed = s
-            args.model1 = 'cnn'
-            # args.model2 = 'fcn'
-            # args.fcn_opt2 = fcn_lst_hiddens[n]
-            args.model2 = 'lstm'
             args.lstm_opt2 = lstm_lst_hiddens[n]
 
             main(args)
 
-    ## Something
-    # for m in range(len(lst_hiddens)):
-    #     for n in range(m, len(lst_hiddens)):
-    #         for s in lst_seed:
-    #             args.model_type = 'coteaching_plus'
-    #             args.dataset = 'news'
-    #             args.n_epoch = 100
-    #             args.noise_type = 'symmetric'
-    #             args.noise_rate = 0.2
-    #
-    #             args.seed = s
-    #             args.model1 = 'lstm'
-    #             args.lstm_opt1 = lst_hiddens[m]
-    #             args.model2 = 'lstm'
-    #             args.lstm_opt2 = lst_hiddens[n]
-    #
-    #             main(args)
 
+if __name__ == '__main__':
+    args = arg_parse()
+    # noise = [('symmetric', 0.2), ('symmetric', 0.5), ('pairflip', 0.45)]
 
-    ## Something
-    # for m in range(len(lst_kernels)):
-    #     for n in range(m, len(lst_kernels)):
-    #         for s in lst_seed:
-    #             args.model_type = 'coteaching_plus'
-    #             if (m == 0) and (n < 2):
-    #                 continue
-    #             args.dataset = 'news'
-    #             # args.n_epoch = 100
-    #             args.n_epoch = 100
-    #             args.noise_type = 'symmetric'
-    #             args.noise_rate = 0.2
-    #
-    #             args.seed = s
-    #             args.model1 = 'cnn'
-    #             args.cnn_opt1 = lst_kernels[m]
-    #             args.model2 = 'cnn'
-    #             args.cnn_opt2 = lst_kernels[n]
-    #
-    #             main(args)
+    ex_cnn_lstm_hidden(args)

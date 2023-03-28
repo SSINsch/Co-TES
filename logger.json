@@ -18,7 +18,7 @@
 			"class": "logging.FileHandler",
 			"level": "DEBUG",
 			"formatter": "basic",
-			"filename": "./logs/debug_20230328.log"
+			"filename": "./logs/debug_20230329.log"
 		}
 	},
 	"root": {
