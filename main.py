@@ -213,8 +213,10 @@ def ex_major_other_models_initepoch(args):
     args.noise_rate = 0.2
     args.init_epoch = 20
 
-    lst_seed = [1, 2, 3]
-    models = ['cnn', 'lstm', 'fcn']
+    # lst_seed = [1, 2, 3]
+    lst_seed = [1]
+    # models = ['cnn', 'lstm', 'fcn']
+    models = ['lstm', 'fcn']
 
     for s in lst_seed:
         for m in range(len(models)):
@@ -309,6 +311,7 @@ def ex_cnn_lstm_hidden(args):
             args.seed = s
             args.lstm_opt2 = lstm_lst_hiddens[n]
 
+            logger.info(f'{args}')
             main(args)
 
 
@@ -316,4 +319,4 @@ if __name__ == '__main__':
     args = arg_parse()
     # noise = [('symmetric', 0.2), ('symmetric', 0.5), ('pairflip', 0.45)]
 
-    ex_cnn_lstm_hidden(args)
+    ex_major_other_models_initepoch(args)
