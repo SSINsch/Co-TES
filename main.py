@@ -237,8 +237,10 @@ def ex_lstm_hidden(args):
     args.model1 = 'lstm'
     args.model2 = 'lstm'
 
-    lst_seed = [1, 2, 3]
-    lst_hiddens = [50, 100, 300]
+    # lst_seed = [1, 2, 3]
+    lst_seed = [3]
+    # lst_hiddens = [50, 100, 300]
+    lst_hiddens = [50, 300, 800]
 
     for s in lst_seed:
         for m in range(len(lst_hiddens)):
@@ -319,4 +321,5 @@ if __name__ == '__main__':
     args = arg_parse()
     # noise = [('symmetric', 0.2), ('symmetric', 0.5), ('pairflip', 0.45)]
 
-    ex_major_other_models_initepoch(args)
+    # ex_major_other_models_initepoch(args)
+    ex_lstm_hidden(args)
