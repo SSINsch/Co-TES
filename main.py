@@ -187,12 +187,15 @@ def main(args):
 def ex_major_other_models(args):
     args.model_type = 'coteaching_plus'
     args.dataset = 'news'
-    args.n_epoch = 200
+    # args.n_epoch = 200
+    args.n_epoch = 100
     args.noise_type = 'symmetric'
-    args.noise_rate = 0.2
+    # args.noise_rate = 0.2
+    args.noise_rate = 0.1
     args.init_epoch = 0
 
-    lst_seed = [1, 2, 3]
+    # lst_seed = [1, 2, 3]
+    lst_seed = [3]
     models = ['cnn', 'lstm', 'fcn']
 
     for s in lst_seed:
@@ -236,11 +239,13 @@ def ex_lstm_hidden(args):
     args.noise_rate = 0.2
     args.model1 = 'lstm'
     args.model2 = 'lstm'
+    args.batch_size = 128
 
     # lst_seed = [1, 2, 3]
     lst_seed = [3]
+    lst_hiddens = [300]
     # lst_hiddens = [50, 100, 300]
-    lst_hiddens = [50, 300, 800]
+    # lst_hiddens = [50, 300, 800]
 
     for s in lst_seed:
         for m in range(len(lst_hiddens)):
@@ -319,7 +324,7 @@ def ex_cnn_lstm_hidden(args):
 
 if __name__ == '__main__':
     args = arg_parse()
-    # noise = [('symmetric', 0.2), ('symmetric', 0.5), ('pairflip', 0.45)]
 
     # ex_major_other_models_initepoch(args)
-    ex_lstm_hidden(args)
+    # ex_lstm_hidden(args)
+    ex_major_other_models(args)
