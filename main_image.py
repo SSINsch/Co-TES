@@ -30,6 +30,7 @@ def count_parameters(model, trainable=False):
 def ex_image_cnn_cnn(args):
     args.dataset = 'cifar10'
     args.n_epoch = 200
+    args.batch_size = 1024
     args.noise_type = 'symmetric'
     args.noise_rate = 0.2
     args.model1 = 'cnn'
@@ -37,7 +38,7 @@ def ex_image_cnn_cnn(args):
     args.model_type = 'coteaching_plus'
 
     lst_seed = [1, 2, 3, 4, 5]
-    lst_kernels = [[3, 3], [5, 5], [7, 7]]
+    lst_kernels = [[3, 4], [5, 5], [5, 7]]
 
     for m in range(len(lst_kernels)):
         for n in range(m, len(lst_kernels)):
@@ -160,7 +161,8 @@ def main(args):
                                   model_type=args.model_type,
                                   rate_schedule=rate_schedule,
                                   noise_or_not=train_dataset.noise_or_not,
-                                  test_loader=test_loader)
+                                  test_loader=test_loader,
+                                  dataset='cifar10')
 
     logger.info('Start train & evaluate')
     for epoch in range(args.n_epoch):

@@ -4,6 +4,7 @@ logs/
 data/news.pkl
 data/news_vocab*
 data/glove*
+data/cifar-10-batches-py/*
 playground/*.pk
 playground/.vector_cache/*
 output.txt

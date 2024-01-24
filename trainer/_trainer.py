@@ -20,6 +20,7 @@ class NewsGroupTrainer:
                  model_type,
                  rate_schedule,
                  noise_or_not,
+                 dataset='news',
                  test_loader=None,
                  eval_loader=None):
         self.model1 = model1
@@ -35,6 +36,7 @@ class NewsGroupTrainer:
         self.model_type = model_type
         self.rate_schedule = rate_schedule
         self.noise_or_not = noise_or_not
+        self.dataset = dataset
 
     def save_model(self, n_epoch, avg_loss, accuracy, macro_f1_score, mode):
         if not os.path.exists(self.output_dir):
@@ -106,8 +108,14 @@ class NewsGroupTrainer:
         for step, (data, labels, indexes) in enumerate(self.train_loader):
             # to cpu / to gpu
             ind = indexes.cpu().numpy().transpose()
-            labels = labels.to(self.device)
-            data = data.long().to(self.device)
+            if self.dataset == 'news':
+                data = data.long().to(self.device)
+                labels = labels.to(self.device)
+            elif self.dataset == 'cifar10':
+                data = data.float().to(self.device)
+                labels = labels.to(self.device).long()
+            else:
+                raise ValueError(f'Unknown dataset {self.dataset}')
 
             # initialize optimizer
             self.optimizer1.zero_grad()
@@ -209,8 +217,14 @@ class NewsGroupTrainer:
             for step, (data, labels, indexes) in enumerate(loader):
                 # to cpu/gpu
                 ind = indexes.cpu().numpy().transpose()
-                labels = labels.to(self.device)
-                data = data.long().to(self.device)
+                if self.dataset == 'news':
+                    data = data.long().to(self.device)
+                    labels = labels.to(self.device)
+                elif self.dataset == 'cifar10':
+                    data = data.float().to(self.device)
+                    labels = labels.to(self.device).long()
+                else:
+                    raise ValueError(f'Unknown dataset {self.dataset}')
 
                 # to model
                 logits_1 = self.model1(data)

@@ -1,6 +1,9 @@
+import logging
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+logger = logging.getLogger(__name__)
 
 
 def call_bn(bn, x):
@@ -14,13 +17,17 @@ class SmallCNN(nn.Module):
         self.pool = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(in_channels=6, out_channels=16, kernel_size=kernel_size[1])
         self.output_size = (((32-kernel_size[0]+1)/2) - kernel_size[1] + 1)/2
+        self.output_size = int(self.output_size)
+        print(self.output_size)
         self.fc1 = nn.Linear(16 * self.output_size * self.output_size, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, num_classes)
 
     def forward(self, x):
-        x = self.pool(F.relu(self.conv1(x)))
-        x = self.pool(F.relu(self.conv2(x)))
+        x = self.conv1(x)
+        x = self.pool(F.relu(x))
+        x = self.conv2(x)
+        x = self.pool(F.relu(x))
         x = x.view(-1, 16 * self.output_size * self.output_size)
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))

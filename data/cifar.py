@@ -64,7 +64,12 @@ class CIFAR10(data.TensorDataset):
             if noise_type != 'clean':
                 # noisify train data
                 self.train_labels=np.asarray([[self.train_labels[i]] for i in range(len(self.train_labels))])
-                self.train_noisy_labels, self.actual_noise_rate = noisify(dataset=self.dataset, train_labels=self.train_labels, noise_type=noise_type, noise_rate=noise_rate, random_state=random_state, nb_classes=self.nb_classes)
+                self.train_noisy_labels, self.actual_noise_rate = noisify(dataset=self.dataset,
+                                                                          train_labels=self.train_labels,
+                                                                          noise_type=noise_type,
+                                                                          noise_rate=noise_rate,
+                                                                          random_state=random_state,
+                                                                          nb_classes=self.num_classes)
                 self.train_noisy_labels=[i[0] for i in self.train_noisy_labels]
                 _train_labels=[i[0] for i in self.train_labels]
                 self.noise_or_not = np.transpose(self.train_noisy_labels)==np.transpose(_train_labels)
