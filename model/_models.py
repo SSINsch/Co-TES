@@ -38,11 +38,16 @@ class SmallCNN(nn.Module):
 class NewsNet(nn.Module):
     alg_name = 'FCN'
 
-    def __init__(self, weights_matrix, hidden_size=300, num_classes=7):
+    def __init__(self, weights_matrix=None, hidden_size=300, num_classes=7,
+                 n_embed=20000, d_embed=300):
         super(NewsNet, self).__init__()
-        n_embed, d_embed = weights_matrix.shape
-        self.embedding = nn.Embedding(n_embed, d_embed)
-        self.embedding.weight.data.copy_(torch.Tensor(weights_matrix))
+        if weights_matrix is not None:
+            n_embed, d_embed = weights_matrix.shape
+            self.embedding = nn.Embedding(n_embed, d_embed)
+            self.embedding.weight.data.copy_(torch.Tensor(weights_matrix))
+        else:
+            n_embed, d_embed = n_embed, d_embed
+            self.embedding = nn.Embedding(n_embed, d_embed)
         self.avgpool = nn.AdaptiveAvgPool1d(16 * hidden_size)
         self.fc1 = nn.Linear(16 * hidden_size, 4 * hidden_size)
         self.bn1 = nn.BatchNorm1d(4 * hidden_size)
@@ -71,17 +76,22 @@ class NewsNet(nn.Module):
 class NewsNetCNN(nn.Module):
     alg_name = 'CNN'
 
-    def __init__(self, weights_matrix,
+    def __init__(self, weights_matrix=None,
                  kernel_windows=[3, 4, 5],
-                 input_channel=1, dropout_rate=0.25, momentum=0.1, num_classes=7):
+                 input_channel=1, dropout_rate=0.25, momentum=0.1, num_classes=7,
+                 n_embed=20000, d_embed=300):
         super(NewsNetCNN, self).__init__()
         self.num_classes = num_classes
 
         # 임베딩용 변수들
         # n_embed = 단어 개수, d_embed = embedding dimension
-        self.n_embed, self.d_embed = weights_matrix.shape
-        self.embedding = nn.Embedding(self.n_embed, self.d_embed)
-        self.embedding.weight.data.copy_(torch.Tensor(weights_matrix))
+        if weights_matrix is not None:
+            self.n_embed, self.d_embed = weights_matrix.shape
+            self.embedding = nn.Embedding(self.n_embed, self.d_embed)
+            self.embedding.weight.data.copy_(torch.Tensor(weights_matrix))
+        else:
+            self.n_embed, self.d_embed = n_embed, d_embed
+            self.embedding = nn.Embedding(self.n_embed, self.d_embed)
 
         # CNN용 변수들
         self.kernel_windows = kernel_windows
@@ -120,17 +130,22 @@ class NewsNetCNN(nn.Module):
 class NewsNetLSTM(nn.Module):
     alg_name = 'LSTM'
 
-    def __init__(self, weights_matrix,
-                 hidden_size=300, num_classes=7):
+    def __init__(self, weights_matrix=None,
+                 hidden_size=300, num_classes=7,
+                 n_embed=20000, d_embed=300):
         super(NewsNetLSTM, self).__init__()
         self.num_classes = num_classes
         self.hidden_size = hidden_size
 
         # 임베딩용 변수들
         # n_embed = 단어 개수, d_embed = embedding dimension
-        self.n_embed, self.d_embed = weights_matrix.shape
-        self.embedding = nn.Embedding(self.n_embed, self.d_embed)
-        self.embedding.weight.data.copy_(torch.Tensor(weights_matrix))
+        if weights_matrix is not None:
+            self.n_embed, self.d_embed = weights_matrix.shape
+            self.embedding = nn.Embedding(self.n_embed, self.d_embed)
+            self.embedding.weight.data.copy_(torch.Tensor(weights_matrix))
+        else:
+            self.n_embed, self.d_embed = n_embed, d_embed
+            self.embedding = nn.Embedding(self.n_embed, self.d_embed)
 
         # BiLSTM layer 세팅
         self.bi_lstm = nn.LSTM(input_size=self.embedding.embedding_dim,

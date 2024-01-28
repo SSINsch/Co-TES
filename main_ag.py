@@ -3,13 +3,16 @@ import torch
 import numpy as np
 from datetime import datetime
 import torchvision.transforms as transforms
+import pandas as pd
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
+from transformers import BertTokenizer
 
 from utils import arg_parse, gen_forget_rate, adjust_learning_rate
-from data import CIFAR10
-from model import SmallCNN
+from data import NewsGroups, AGNews
+from model import NewsNet, NewsNetCNN, NewsNetLSTM
 from trainer import NewsGroupTrainer
+from model import NewsNetVDCNN
 
 import logging.config
 import json
@@ -20,35 +23,25 @@ logging.config.dictConfig(config)
 logger = logging.getLogger(__name__)
 
 
-def count_parameters(model, trainable=False):
-    if trainable is True:
-        return sum(p.numel() for p in model.parameters() if p.requires_grad)
-    else:
-        return sum(p.numel() for p in model.parameters())
-
-
-def ex_image_cnn_cnn(args):
-    args.dataset = 'cifar10'
+def ex_ag_news(args):
+    args.model_type = 'coteaching_plus'
+    args.dataset = 'ag_news'
     # args.n_epoch = 200
     args.n_epoch = 100
-    args.batch_size = 1024
     args.noise_type = 'symmetric'
     args.noise_rate = 0.2
-    args.model1 = 'cnn'
-    args.model2 = 'cnn'
-    args.model_type = 'coteaching_plus'
-    args.init_epoch = 20
+    args.init_epoch = 0
 
-    # lst_seed = [1, 2, 3, 4, 5]
+    # lst_seed = [1, 2, 3]
     lst_seed = [3]
-    lst_kernels = [[3, 2], [3, 4], [3, 6], [3, 8], [5, 3], [5, 5], [5, 7], [7, 4], [7, 6], [7, 8]]
+    models = ['cnn', 'lstm', 'fcn']
 
     for s in lst_seed:
-        for m in range(len(lst_kernels)):
-            for n in range(m, len(lst_kernels)):
+        for m in range(len(models)):
+            for n in range(m, len(models)):
                 args.seed = s
-                args.cnn_opt1 = lst_kernels[m]
-                args.cnn_opt2 = lst_kernels[n]
+                args.model1 = models[m]
+                args.model2 = models[n]
 
                 main(args)
 
@@ -81,24 +74,21 @@ def main(args):
     rate_schedule = gen_forget_rate(args.n_epoch, args.num_gradual, forget_rate, args.fr_type)
 
     # load dataset
-    num_classes = 0
-    if args.dataset == 'cifar10':
+    if args.dataset == 'ag_news':
         init_epoch = args.init_epoch
-        num_classes = 10
-
-        train_dataset = CIFAR10(root='./data/',
-                                train=True,
-                                transform=transforms.ToTensor(),
-                                noise_type=args.noise_type,
-                                noise_rate=args.noise_rate
-                                )
-
-        test_dataset = CIFAR10(root='./data/',
-                               train=False,
+        train_dataset = AGNews(root='./data/',
+                               train=True,
                                transform=transforms.ToTensor(),
                                noise_type=args.noise_type,
                                noise_rate=args.noise_rate
                                )
+        test_dataset = AGNews(root='./data/',
+                              train=False,
+                              transform=transforms.ToTensor(),
+                              noise_type=args.noise_type,
+                              noise_rate=args.noise_rate
+                              )
+        num_classes = train_dataset.num_classes
 
     else:
         raise Exception(f'Unknown dataset {args.dataset}')
@@ -119,26 +109,31 @@ def main(args):
 
     # build model 1
     logger.info('Building model...')
-    if args.model1 == 'cnn':
-        clf1 = SmallCNN(kernel_size=args.cnn_opt1, num_classes=num_classes)
+    if args.model1 == 'fcn':
+        clf1 = NewsNet(n_embed=20000, d_embed=300, num_classes=num_classes, hidden_size=args.fcn_opt1)
+    elif args.model1 == 'cnn':
+        clf1 = NewsNetCNN(n_embed=20000, d_embed=300, num_classes=num_classes, kernel_windows=args.cnn_opt1)
+    elif args.model1 == 'lstm':
+        clf1 = NewsNetLSTM(n_embed=20000, d_embed=300, num_classes=num_classes, hidden_size=args.lstm_opt1)
     else:
         raise Exception(f'Unknown model name {args.model1}')
 
     clf1.cuda()
     logger.info(clf1.parameters)
-    logger.info(f'model parameters(trainable/all): {count_parameters(clf1, trainable=True)} / {count_parameters(clf1)}')
-
     optimizer1 = torch.optim.Adam(clf1.parameters(), lr=learning_rate)
 
     # build model 2
-    if args.model2 == 'cnn':
-        clf2 = SmallCNN(kernel_size=args.cnn_opt2, num_classes=num_classes)
+    if args.model2 == 'fcn':
+        clf2 = NewsNet(n_embed=20000, d_embed=300, num_classes=num_classes, hidden_size=args.fcn_opt2)
+    elif args.model2 == 'cnn':
+        clf2 = NewsNetCNN(n_embed=20000, d_embed=300, num_classes=num_classes, kernel_windows=args.cnn_opt2)
+    elif args.model2 == 'lstm':
+        clf2 = NewsNetLSTM(n_embed=20000, d_embed=300, num_classes=num_classes, hidden_size=args.lstm_opt2)
     else:
         raise Exception(f'Unknown model name {args.model2}')
 
     clf2.cuda()
     logger.info(clf2.parameters)
-    logger.info(f'model parameters(trainable/all): {count_parameters(clf2, trainable=True)} / {count_parameters(clf2)}')
     optimizer2 = torch.optim.Adam(clf2.parameters(), lr=learning_rate)
 
     # set result folder and file
@@ -164,8 +159,7 @@ def main(args):
                                   model_type=args.model_type,
                                   rate_schedule=rate_schedule,
                                   noise_or_not=train_dataset.noise_or_not,
-                                  test_loader=test_loader,
-                                  dataset='cifar10')
+                                  test_loader=test_loader)
 
     logger.info('Start train & evaluate')
     for epoch in range(args.n_epoch):
@@ -195,4 +189,4 @@ def main(args):
 
 if __name__ == '__main__':
     args = arg_parse()
-    ex_image_cnn_cnn(args)
+    ex_ag_news(args)

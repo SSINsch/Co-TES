@@ -2,7 +2,7 @@
 */__pycache__/*
 logs/
 data/news.pkl
-data/news_vocab*
+data/ag_*
 data/glove*
 data/cifar-10-batches-py/*
 playground/*.pk

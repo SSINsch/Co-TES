@@ -190,13 +190,14 @@ def ex_major_other_models(args):
     # args.n_epoch = 200
     args.n_epoch = 100
     args.noise_type = 'symmetric'
-    # args.noise_rate = 0.2
-    args.noise_rate = 0.1
+    args.noise_rate = 0.2
+    # args.noise_rate = 0.1
     args.init_epoch = 0
 
     # lst_seed = [1, 2, 3]
     lst_seed = [3]
     models = ['cnn', 'lstm', 'fcn']
+    # models = ['fcn']
 
     for s in lst_seed:
         for m in range(len(models)):
