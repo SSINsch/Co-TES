@@ -10,15 +10,15 @@
 	"handlers": {
 		"console": {
 			"class": "logging.StreamHandler",
-			"level": "DEBUG",
+			"level": "INFO",
 			"formatter": "basic",
 			"stream": "ext://sys.stdout"
 		},
 		"file": {
 			"class": "logging.FileHandler",
-			"level": "DEBUG",
+			"level": "INFO",
 			"formatter": "basic",
-			"filename": "./logs/debug_20240128.log"
+			"filename": "./logs/debug_20240203.log"
 		}
 	},
 	"root": {

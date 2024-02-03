@@ -31,9 +31,11 @@ def ex_ag_news(args):
     args.noise_type = 'symmetric'
     args.noise_rate = 0.2
     args.init_epoch = 0
+    args.batch_size = 128
+    args.cnn_opt1 = [3, 4]
+    args.cnn_opt2 = [3, 4]
 
-    # lst_seed = [1, 2, 3]
-    lst_seed = [3]
+    lst_seed = [3, 2 ,1]
     models = ['cnn', 'lstm', 'fcn']
 
     for s in lst_seed:
@@ -44,6 +46,32 @@ def ex_ag_news(args):
                 args.model2 = models[n]
 
                 main(args)
+
+
+
+def ex_ag_news_find_cc(args):
+    args.model_type = 'coteaching_plus'
+    args.dataset = 'ag_news'
+    # args.n_epoch = 200
+    args.n_epoch = 100
+    args.noise_type = 'symmetric'
+    args.noise_rate = 0.2
+    args.init_epoch = 0
+    args.batch_size = 128
+    args.model1 = 'cnn'
+    args.model2 = 'cnn'
+
+    lst_seed = [3, 2, 1]
+    lst_kernels = [[5, 6], [3, 4, 5], [3, 4]]
+
+    for s in lst_seed:
+        for m in range(len(lst_kernels)):
+            args.model_type = 'coteaching_plus'
+            args.seed = s
+            args.cnn_opt1 = lst_kernels[m]
+            args.cnn_opt2 = lst_kernels[m]
+
+            main(args)
 
 
 def main(args):
@@ -189,4 +217,5 @@ def main(args):
 
 if __name__ == '__main__':
     args = arg_parse()
-    ex_ag_news(args)
+    # ex_ag_news(args)
+    ex_ag_news_find_cc(args)

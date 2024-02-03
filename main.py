@@ -269,14 +269,13 @@ def ex_cnn_kernel(args):
     lst_kernels = [[3, 4], [5, 6], [3, 4, 5]]
 
     for m in range(len(lst_kernels)):
-        for n in range(m, len(lst_kernels)):
-            for s in lst_seed:
-                args.model_type = 'coteaching_plus'
-                args.seed = s
-                args.cnn_opt1 = lst_kernels[m]
-                args.cnn_opt2 = lst_kernels[n]
+        for s in lst_seed:
+            args.model_type = 'coteaching_plus'
+            args.seed = s
+            args.cnn_opt1 = lst_kernels[m]
+            args.cnn_opt2 = lst_kernels[m]
 
-                main(args)
+            main(args)
 
 
 def ex_cnn_fcn_hidden(args):
@@ -329,3 +328,4 @@ if __name__ == '__main__':
     # ex_major_other_models_initepoch(args)
     # ex_lstm_hidden(args)
     ex_major_other_models(args)
+
