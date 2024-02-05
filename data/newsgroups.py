@@ -6,8 +6,6 @@ import logging
 
 import torch
 import torch.utils.data as data
-from sklearn.datasets import fetch_20newsgroups
-from transformers import BertTokenizer
 
 from utils import noisify
 

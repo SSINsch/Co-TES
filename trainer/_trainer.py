@@ -1,7 +1,6 @@
 from sklearn.metrics import f1_score
 import os
 import torch
-import torch.nn.functional as F
 
 from utils import to_np
 from utils import basic_accuracy

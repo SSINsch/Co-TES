@@ -1,9 +1,7 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 import numpy as np
-from numpy.testing import assert_array_almost_equal
 import logging
 
 logger = logging.getLogger(__name__)
