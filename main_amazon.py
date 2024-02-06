@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
 from utils import arg_parse, gen_forget_rate, adjust_learning_rate
-from data import IMDB
+from data import Amazon
 from model import NewsNet, NewsNetCNN, NewsNetLSTM
 from trainer import NewsGroupTrainer
 
@@ -48,20 +48,20 @@ def main(args):
     rate_schedule = gen_forget_rate(args.n_epoch, args.num_gradual, forget_rate, args.fr_type)
 
     # load dataset
-    if args.dataset == 'imdb':
+    if args.dataset == 'amazon':
         init_epoch = args.init_epoch
-        train_dataset = IMDB(root='./data/',
-                             train=True,
-                             transform=transforms.ToTensor(),
-                             noise_type=args.noise_type,
-                             noise_rate=args.noise_rate
-                             )
-        test_dataset = IMDB(root='./data/',
-                            train=False,
-                            transform=transforms.ToTensor(),
-                            noise_type=args.noise_type,
-                            noise_rate=args.noise_rate
-                            )
+        train_dataset = Amazon(root='./data/',
+                               train=True,
+                               transform=transforms.ToTensor(),
+                               noise_type=args.noise_type,
+                               noise_rate=args.noise_rate
+                               )
+        test_dataset = Amazon(root='./data/',
+                              train=False,
+                              transform=transforms.ToTensor(),
+                              noise_type=args.noise_type,
+                              noise_rate=args.noise_rate
+                              )
         num_classes = train_dataset.num_classes
 
     else:
@@ -161,35 +161,30 @@ def main(args):
     writer.close()
 
 
-def ex_imdb(args):
+def ex_amazon(args):
     args.model_type = 'coteaching_plus'
-    args.dataset = 'imdb'
+    args.dataset = 'amazon'
     # args.n_epoch = 200
     args.n_epoch = 100
     args.noise_type = 'symmetric'
     args.noise_rate = 0.2
     args.init_epoch = 0
-    args.batch_size = 128
+    args.batch_size = 1024
     args.cnn_opt1 = [3, 4]
     args.cnn_opt2 = [3, 4]
 
-    # lst_seed = [1, 2, 3]
-    lst_seed = [2, 3]
-    # lst_seed = [3]
-    models = ['cnn', 'lstm', 'fcn']
+    lst_seed = [3, 2, 1]
+    models = ['lstm', 'cnn', 'fcn']
 
     for s in lst_seed:
         for m in range(len(models)):
             for n in range(m, len(models)):
                 args.seed = s
-                if (s == 2) and (models[m] == 'cnn') and (models[n] == 'cnn'):
-                    continue
                 args.model1 = models[m]
                 args.model2 = models[n]
-
                 main(args)
 
 
 if __name__ == '__main__':
     args = arg_parse()
-    ex_imdb(args)
+    ex_amazon(args)

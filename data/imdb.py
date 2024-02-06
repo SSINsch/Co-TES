@@ -1,6 +1,7 @@
 import os
 import os.path
 import numpy as np
+import torch
 import pickle
 import logging
 import torch.utils.data as data
@@ -25,6 +26,7 @@ class IMDB(data.TensorDataset):
 
         if self.train:
             self.train_data, self.train_labels = pickle.load(open(os.path.join(self.root, "IMDB_Dataset-train_sample.pkl"), "rb"), encoding='iso-8859-1')
+            self.train_labels = torch.from_numpy(self.train_labels).long()
 
             # noisify train data
             if noise_type is not None:
@@ -42,6 +44,7 @@ class IMDB(data.TensorDataset):
 
         else:
             self.test_data, self.test_labels = pickle.load(open(os.path.join(self.root, "IMDB_Dataset-test_sample.pkl"), "rb"), encoding='iso-8859-1')
+            self.test_labels = torch.from_numpy(self.test_labels).long()
 
     def __getitem__(self, index):
         if self.train:

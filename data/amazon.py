@@ -11,7 +11,7 @@ from utils import noisify
 logger = logging.getLogger(__name__)
 
 
-class AGNews(data.TensorDataset):
+class Amazon(data.TensorDataset):
     def __init__(self,
                  root='./data', train=True, transform=None, target_transform=None,
                  noise_type=None, noise_rate=0.2, random_state=0):
@@ -21,11 +21,11 @@ class AGNews(data.TensorDataset):
         self.target_transform = target_transform
         self.train = train  # training set or test set
         self.noise_type = noise_type
-        self.dataset = 'ag_news'
-        self.num_classes = 4
+        self.dataset = 'amazon'
+        self.num_classes = 2
 
         if self.train:
-            self.train_data, self.train_labels = pickle.load(open(os.path.join(self.root, "ag_train_sample.pkl"), "rb"), encoding='iso-8859-1')
+            self.train_data, self.train_labels = pickle.load(open(os.path.join(self.root, "Amazon_review-sample-train.pkl"), "rb"), encoding='iso-8859-1')
             self.train_labels = torch.from_numpy(self.train_labels).long()
 
             # noisify train data
@@ -43,7 +43,7 @@ class AGNews(data.TensorDataset):
                 logger.info(f'label precision: {1 - self.actual_noise_rate}')
 
         else:
-            self.test_data, self.test_labels = pickle.load(open(os.path.join(self.root, "ag_test_sample.pkl"), "rb"), encoding='iso-8859-1')
+            self.test_data, self.test_labels = pickle.load(open(os.path.join(self.root, "Amazon_review-sample-test.pkl"), "rb"), encoding='iso-8859-1')
             self.test_labels = torch.from_numpy(self.test_labels).long()
 
     def __getitem__(self, index):

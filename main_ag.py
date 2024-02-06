@@ -28,13 +28,12 @@ def ex_ag_news(args):
     args.noise_type = 'symmetric'
     args.noise_rate = 0.2
     args.init_epoch = 0
-    args.batch_size = 128
+    args.batch_size = 1024
     args.cnn_opt1 = [3, 4]
     args.cnn_opt2 = [3, 4]
 
-    # lst_seed = [3, 2 ,1]
-    lst_seed = [1, 4]
-    models = ['cnn', 'lstm', 'fcn']
+    lst_seed = [4, 3, 2 ,1]
+    models = ['lstm', 'cnn', 'fcn']
 
     for s in lst_seed:
         for m in range(len(models)):
