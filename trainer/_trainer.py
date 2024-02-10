@@ -216,15 +216,8 @@ class NewsGroupTrainer:
             for step, (data, labels, indexes) in enumerate(loader):
                 # to cpu/gpu
                 ind = indexes.cpu().numpy().transpose()
-                if self.dataset == 'news':
-                    data = data.long().to(self.device)
-                    labels = labels.to(self.device)
-                elif self.dataset == 'cifar10':
-                    data = data.float().to(self.device)
-                    labels = labels.to(self.device).long()
-                else:
-                    raise ValueError(f'Unknown dataset {self.dataset}')
-
+                data = data.long().to(self.device)
+                labels = labels.to(self.device)
                 # to model
                 logits_1 = self.model1(data)
                 max_predictions_1, argmax_predictions_1 = logits_1.max(1)

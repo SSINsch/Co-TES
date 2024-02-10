@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
 from utils import arg_parse, gen_forget_rate, adjust_learning_rate
-from data import AGNews
+from data import ClickBait
 from model import NewsNet, NewsNetCNN, NewsNetLSTM
 from trainer import NewsGroupTrainer
 
@@ -18,57 +18,6 @@ config = json.load(open('./logger.json'))
 logging.config.dictConfig(config)
 
 logger = logging.getLogger(__name__)
-
-
-def ex_ag_news(args):
-    args.model_type = 'coteaching_plus'
-    args.dataset = 'ag_news'
-    # args.n_epoch = 200
-    args.n_epoch = 100
-    args.noise_type = 'symmetric'
-    args.noise_rate = 0.2
-    args.init_epoch = 0
-    args.batch_size = 1024
-    args.cnn_opt1 = [3, 4]
-    args.cnn_opt2 = [3, 4]
-
-    lst_seed = [3, 2, 1, 4]
-    models = ['lstm', 'cnn', 'fcn']
-
-    for s in lst_seed:
-        for m in range(len(models)):
-            for n in range(m, len(models)):
-                args.seed = s
-                args.model1 = models[m]
-                args.model2 = models[n]
-
-                main(args)
-
-
-
-def ex_ag_news_find_cc(args):
-    args.model_type = 'coteaching_plus'
-    args.dataset = 'ag_news'
-    # args.n_epoch = 200
-    args.n_epoch = 100
-    args.noise_type = 'symmetric'
-    args.noise_rate = 0.2
-    args.init_epoch = 0
-    args.batch_size = 128
-    args.model1 = 'cnn'
-    args.model2 = 'cnn'
-
-    lst_seed = [3, 2, 1]
-    lst_kernels = [[5, 6], [3, 4, 5], [3, 4]]
-
-    for s in lst_seed:
-        for m in range(len(lst_kernels)):
-            args.model_type = 'coteaching_plus'
-            args.seed = s
-            args.cnn_opt1 = lst_kernels[m]
-            args.cnn_opt2 = lst_kernels[m]
-
-            main(args)
 
 
 def main(args):
@@ -99,20 +48,20 @@ def main(args):
     rate_schedule = gen_forget_rate(args.n_epoch, args.num_gradual, forget_rate, args.fr_type)
 
     # load dataset
-    if args.dataset == 'ag_news':
+    if args.dataset == 'click_bait':
         init_epoch = args.init_epoch
-        train_dataset = AGNews(root='./data/',
-                               train=True,
-                               transform=transforms.ToTensor(),
-                               noise_type=args.noise_type,
-                               noise_rate=args.noise_rate
-                               )
-        test_dataset = AGNews(root='./data/',
-                              train=False,
-                              transform=transforms.ToTensor(),
-                              noise_type=args.noise_type,
-                              noise_rate=args.noise_rate
-                              )
+        train_dataset = ClickBait(root='./data/',
+                                  train=True,
+                                  transform=transforms.ToTensor(),
+                                  noise_type=args.noise_type,
+                                  noise_rate=args.noise_rate
+                                  )
+        test_dataset = ClickBait(root='./data/',
+                                 train=False,
+                                 transform=transforms.ToTensor(),
+                                 noise_type=args.noise_type,
+                                 noise_rate=args.noise_rate
+                                 )
         num_classes = train_dataset.num_classes
 
     else:
@@ -212,7 +161,30 @@ def main(args):
     writer.close()
 
 
+def ex_clickbait(args):
+    args.model_type = 'coteaching_plus'
+    args.dataset = 'click_bait'
+    # args.n_epoch = 200
+    args.n_epoch = 100
+    args.noise_type = 'symmetric'
+    args.noise_rate = 0.2
+    args.init_epoch = 0
+    args.batch_size = 2048
+    args.cnn_opt1 = [3, 4]
+    args.cnn_opt2 = [3, 4]
+
+    lst_seed = [3, 2]
+    models = ['lstm', 'cnn', 'fcn']
+
+    for s in lst_seed:
+        for m in range(len(models)):
+            for n in range(m, len(models)):
+                args.seed = s
+                args.model1 = models[m]
+                args.model2 = models[n]
+                main(args)
+
+
 if __name__ == '__main__':
     args = arg_parse()
-    ex_ag_news(args)
-    # ex_ag_news_find_cc(args)
+    ex_clickbait(args)

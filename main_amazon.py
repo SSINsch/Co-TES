@@ -165,7 +165,7 @@ def ex_amazon(args):
     args.model_type = 'coteaching_plus'
     args.dataset = 'amazon'
     # args.n_epoch = 200
-    args.n_epoch = 100
+    args.n_epoch = 50
     args.noise_type = 'symmetric'
     args.noise_rate = 0.2
     args.init_epoch = 0
@@ -173,7 +173,7 @@ def ex_amazon(args):
     args.cnn_opt1 = [3, 4]
     args.cnn_opt2 = [3, 4]
 
-    lst_seed = [3, 2, 1]
+    lst_seed = [4, 1]
     models = ['lstm', 'cnn', 'fcn']
 
     for s in lst_seed:

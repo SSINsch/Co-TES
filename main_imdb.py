@@ -182,8 +182,6 @@ def ex_imdb(args):
         for m in range(len(models)):
             for n in range(m, len(models)):
                 args.seed = s
-                if (s == 2) and (models[m] == 'cnn') and (models[n] == 'cnn'):
-                    continue
                 args.model1 = models[m]
                 args.model2 = models[n]
 
