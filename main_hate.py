@@ -177,7 +177,8 @@ def ex_hate(args):
     args.cnn_opt1 = [3, 4]
     args.cnn_opt2 = [3, 4]
 
-    lst_seed = [4, 3, 2, 1]
+    # lst_seed = [3, 2, 1, 4]
+    lst_seed = [1, 4]
     models = ['cnn', 'lstm', 'fcn']
 
     for s in lst_seed:

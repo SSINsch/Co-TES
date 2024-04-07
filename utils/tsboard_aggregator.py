@@ -77,6 +77,10 @@ class TensorBoardPrinter:
                     df_key = 'train_acc'
                 elif 'test_acc' in mt:
                     df_key = 'test_acc'
+                elif 'train_f1' in mt:
+                    df_key = 'train_f1'
+                elif 'test_f1' in mt:
+                    df_key = 'test_f1'
                 else:
                     logger.error(f'Metric not specified!')
                     raise KeyError(f'Metric not specified!')

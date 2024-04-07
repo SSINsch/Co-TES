@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
 from utils import arg_parse, gen_forget_rate, adjust_learning_rate
-from data import Yahoo
+from data import Sarcasm
 from model import NewsNet, NewsNetCNN, NewsNetLSTM
 from trainer import NewsGroupTrainer
 
@@ -18,6 +18,31 @@ config = json.load(open('./logger.json'))
 logging.config.dictConfig(config)
 
 logger = logging.getLogger(__name__)
+
+
+def ex_sarcasm(args):
+    args.model_type = 'coteaching_plus'
+    args.dataset = 'sarcasm'
+    # args.n_epoch = 200
+    args.n_epoch = 100
+    args.noise_type = 'symmetric'
+    args.noise_rate = 0.2
+    args.init_epoch = 0
+    args.batch_size = 2048
+    args.cnn_opt1 = [3, 4]
+    args.cnn_opt2 = [3, 4]
+
+    lst_seed = [4, 1]
+    models = ['cnn', 'lstm', 'fcn']
+
+    for s in lst_seed:
+        for m in range(len(models)):
+            for n in range(m, len(models)):
+                args.seed = s
+                args.model1 = models[m]
+                args.model2 = models[n]
+
+                main(args)
 
 
 def main(args):
@@ -48,20 +73,20 @@ def main(args):
     rate_schedule = gen_forget_rate(args.n_epoch, args.num_gradual, forget_rate, args.fr_type)
 
     # load dataset
-    if args.dataset == 'yahoo':
+    if args.dataset == 'sarcasm':
         init_epoch = args.init_epoch
-        train_dataset = Yahoo(root='./data/',
-                              train=True,
-                              transform=transforms.ToTensor(),
-                              noise_type=args.noise_type,
-                              noise_rate=args.noise_rate
-                              )
-        test_dataset = Yahoo(root='./data/',
-                             train=False,
-                             transform=transforms.ToTensor(),
-                             noise_type=args.noise_type,
-                             noise_rate=args.noise_rate
-                             )
+        train_dataset = Sarcasm(root='./data/',
+                                train=True,
+                                transform=transforms.ToTensor(),
+                                noise_type=args.noise_type,
+                                noise_rate=args.noise_rate
+                                )
+        test_dataset = Sarcasm(root='./data/',
+                               train=False,
+                               transform=transforms.ToTensor(),
+                               noise_type=args.noise_type,
+                               noise_rate=args.noise_rate
+                               )
         num_classes = train_dataset.num_classes
 
     else:
@@ -161,31 +186,6 @@ def main(args):
     writer.close()
 
 
-def ex_yahoo(args):
-    args.model_type = 'coteaching_plus'
-    args.dataset = 'yahoo'
-    # args.n_epoch = 200
-    args.n_epoch = 50
-    args.noise_type = 'symmetric'
-    args.noise_rate = 0.2
-    args.init_epoch = 0
-    args.batch_size = 512
-    args.cnn_opt1 = [3, 4]
-    args.cnn_opt2 = [3, 4]
-
-    lst_seed = [3, 2, 1]
-    models = ['cnn', 'lstm', 'fcn']
-
-    for s in lst_seed:
-        for m in range(len(models)):
-            for n in range(m, len(models)):
-                args.seed = s
-                args.model1 = models[m]
-                args.model2 = models[n]
-
-                main(args)
-
-
 if __name__ == '__main__':
     args = arg_parse()
-    ex_yahoo(args)
+    ex_sarcasm(args)

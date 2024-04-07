@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
 from utils import arg_parse, gen_forget_rate, adjust_learning_rate
-from data import Yahoo
+from data import WomenClothing
 from model import NewsNet, NewsNetCNN, NewsNetLSTM
 from trainer import NewsGroupTrainer
 
@@ -48,20 +48,20 @@ def main(args):
     rate_schedule = gen_forget_rate(args.n_epoch, args.num_gradual, forget_rate, args.fr_type)
 
     # load dataset
-    if args.dataset == 'yahoo':
+    if args.dataset == 'w_clothing':
         init_epoch = args.init_epoch
-        train_dataset = Yahoo(root='./data/',
-                              train=True,
-                              transform=transforms.ToTensor(),
-                              noise_type=args.noise_type,
-                              noise_rate=args.noise_rate
-                              )
-        test_dataset = Yahoo(root='./data/',
-                             train=False,
-                             transform=transforms.ToTensor(),
-                             noise_type=args.noise_type,
-                             noise_rate=args.noise_rate
-                             )
+        train_dataset = WomenClothing(root='./data/',
+                                      train=True,
+                                      transform=transforms.ToTensor(),
+                                      noise_type=args.noise_type,
+                                      noise_rate=args.noise_rate
+                                      )
+        test_dataset = WomenClothing(root='./data/',
+                                     train=False,
+                                     transform=transforms.ToTensor(),
+                                     noise_type=args.noise_type,
+                                     noise_rate=args.noise_rate
+                                     )
         num_classes = train_dataset.num_classes
 
     else:
@@ -157,24 +157,29 @@ def main(args):
                            global_step=epoch,
                            tag_scalar_dict={'train_acc': train_result['Avg acc'],
                                             'test_acc': test_result['Acc']})
+        writer.add_scalars(main_tag='F1/train_test',
+                           global_step=epoch,
+                           tag_scalar_dict={'train_f1': train_result['Avg f1-score'],
+                                            'test_f1': test_result['f1-score']})
 
     writer.close()
 
 
-def ex_yahoo(args):
+def ex_clothing(args):
     args.model_type = 'coteaching_plus'
-    args.dataset = 'yahoo'
+    args.dataset = 'w_clothing'
     # args.n_epoch = 200
-    args.n_epoch = 50
+    args.n_epoch = 100
     args.noise_type = 'symmetric'
     args.noise_rate = 0.2
     args.init_epoch = 0
-    args.batch_size = 512
+    args.batch_size = 1024
     args.cnn_opt1 = [3, 4]
     args.cnn_opt2 = [3, 4]
 
-    lst_seed = [3, 2, 1]
-    models = ['cnn', 'lstm', 'fcn']
+    # lst_seed = [3, 2, 1, 4]
+    lst_seed = [3, 2]
+    models = ['lstm', 'cnn', 'fcn']
 
     for s in lst_seed:
         for m in range(len(models)):
@@ -188,4 +193,4 @@ def ex_yahoo(args):
 
 if __name__ == '__main__':
     args = arg_parse()
-    ex_yahoo(args)
+    ex_clothing(args)

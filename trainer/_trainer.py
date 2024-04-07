@@ -277,11 +277,11 @@ class NewsGroupTrainer:
         if acc_1 > acc_2:
             avg_acc = acc_1
             avg_loss = avg_loss_1
-            avg_f1 = 0
+            avg_f1 = macro_f1_score_1
         else:
             avg_acc = acc_2
             avg_loss = avg_loss_2
-            avg_f1 = 0
+            avg_f1 = macro_f1_score_2
 
         result = {'Acc': avg_acc, 'f1-score': avg_f1, 'loss': avg_loss}
 
