@@ -92,8 +92,3 @@ def get_subdirs(p):
             ex_folders.append(it.path)
 
     return ex_folders
-
-
-if __name__ == '__main__':
-    p = '../logs/news/coteaching_plus/symmetric_0.2_seed4_ll_2022-11-03-19-58'
-    get_subdirs(p)

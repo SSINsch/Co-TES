@@ -1,17 +1,28 @@
+# Co–TES: Learning noisy labels with a Co-Teaching Exchange Student method
 
-# To do  
-- 기본 실험 : 진행 완료
-  - ```CNN + CNN```, ```CNN + LSTM```, ```CNN + FCN```, ```LSTM + FCN```, ```LSTM + LSTM```, ```FCN + FCN```  (100 epoch) * 5
-  - ```CNN + CNN```, ```CNN + LSTM```, ```CNN + FCN```, ```LSTM + FCN```, ```LSTM + LSTM```, ```FCN + FCN```  (200 epoch) * 3
-  - ```LSTM + LSTM``` 모델 ```50```, ```100```, ```300``` 차원에 대해 조합 실험 (60 epoch) * 3
-  - 그리고 위의 실험들 Loss 그래프
+Pattern Recognition Letters: [Co–TES: Learning noisy labels with a Co-Teaching Exchange Student method](https://www.sciencedirect.com/science/article/abs/pii/S0167865524001028)
 
-- 모델 파라미터 개수(모델 크기)에 따른 조합 결과 : 진행 중
-  - ```CNN + FCN50```, ```CNN + FCN300```, ```CNN + FCN1500``` (200 epoch) * 1
-  - (실험 ing) ```CNN + LSTM50```, ```CNN + LSTM300```, ```CNN + LSTM400``` (200 epoch) * 1
+Some code is adapted from [Co-teaching+](https://github.com/xingruiyu/coteaching_plus/).
 
-- ```~20 epoch coteaching w/ Co-TES``` , ```(20~100 epoch coteaching+ w/ Co-TES)``` : 진행 예정
-  - 성능 상의 차이를 보이는지 보고자
 
-- 모델 크기에 따른 파라미터 개수 조사 or 초기 weigth vector L2 norm 조사
-  - Decoupling 논문의 upper bound 관련 내용
+## Run
+1. edit some arguments in ```main.py```.
+2. run ```python main.py```
+
+
+## Cite
+```bash
+@article{SHIN202417,
+  title = {Co–TES: Learning noisy labels with a Co-Teaching Exchange Student method},
+  journal = {Pattern Recognition Letters},
+  volume = {182},
+  pages = {17-23},
+  year = {2024},
+  issn = {0167-8655},
+  doi = {https://doi.org/10.1016/j.patrec.2024.04.001},
+  url = {https://www.sciencedirect.com/science/article/pii/S0167865524001028},
+  author = {Chan Ho Shin and Seong-jun Oh},
+  keywords = {Learning with noisy labels, Co-teaching, Multi-network learning},
+  abstract = {The performance of a machine-learning model is influenced by two main factors: the structure of the model, and the quality of the dataset it processes. As high-quality labeled data in substantial size is often difficult to obtain, there are ongoing efforts to develop machine learning algorithms that are robust with noisy datasets. Among these algorithms, multi-network learning utilizes learning from a noisy dataset by the selection and filtering of samples through multiple learning networks. We propose an improved co-teaching algorithm termed Co-TES that leverages different models with various architectures. Co-TES extracts different features from each iteration of data selection and makes the model more robust with the same quality dataset. Numerical results show that the proposed method can lead to faster performance gains in the early to mid-range.}
+}
+```

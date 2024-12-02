@@ -20,9 +20,6 @@ logging.config.dictConfig(config)
 
 logger = logging.getLogger(__name__)
 
-# Note. init epoch 로 co-teaching, co-teachin+ 조절 중
-# INIT_EPOCH = 200
-
 
 def count_parameters(model, trainable=False):
     if trainable is True:
@@ -109,11 +106,6 @@ def main(args):
     logger.info(clf1.parameters)
     logger.info(f'model parameters(trainable/all): {count_parameters(clf1, trainable=True)} / {count_parameters(clf1)}')
 
-    # for name, param in clf1.named_parameters():
-    #     weight1 = param.detach().cpu().numpy()
-    #     l2norm = param.data.norm(dim=1, p=2)
-    #     print(f'{name}: {l2norm}')
-
     optimizer1 = torch.optim.Adam(clf1.parameters(), lr=learning_rate)
 
     # build model 2
@@ -187,145 +179,23 @@ def main(args):
 def ex_major_other_models(args):
     args.model_type = 'coteaching_plus'
     args.dataset = 'news'
-    # args.n_epoch = 200
-    args.n_epoch = 100
+    args.n_epoch = 200
     args.noise_type = 'symmetric'
     args.noise_rate = 0.2
-    # args.noise_rate = 0.1
     args.init_epoch = 0
 
-    # lst_seed = [1, 2, 3]
-    lst_seed = [3]
+    lst_seed = [1, 2, 3]
     models = ['cnn', 'lstm', 'fcn']
-    # models = ['fcn']
 
     for s in lst_seed:
         for m in range(len(models)):
-            for n in range(m, len(models)):
-                args.seed = s
-                args.model1 = models[m]
-                args.model2 = models[n]
-
-                main(args)
-
-
-def ex_major_other_models_initepoch(args):
-    args.model_type = 'coteaching_plus'
-    args.dataset = 'news'
-    args.n_epoch = 200
-    args.noise_type = 'symmetric'
-    args.noise_rate = 0.2
-    args.init_epoch = 20
-
-    # lst_seed = [1, 2, 3]
-    lst_seed = [1]
-    # models = ['cnn', 'lstm', 'fcn']
-    models = ['lstm', 'fcn']
-
-    for s in lst_seed:
-        for m in range(len(models)):
-            for n in range(m, len(models)):
-                args.seed = s
-                args.model1 = models[m]
-                args.model2 = models[n]
-
-                main(args)
-
-
-def ex_lstm_hidden(args):
-    args.model_type = 'coteaching_plus'
-    args.dataset = 'news'
-    args.n_epoch = 200
-    args.noise_type = 'symmetric'
-    args.noise_rate = 0.2
-    args.model1 = 'lstm'
-    args.model2 = 'lstm'
-    args.batch_size = 128
-
-    # lst_seed = [1, 2, 3]
-    lst_seed = [3]
-    lst_hiddens = [300]
-    # lst_hiddens = [50, 100, 300]
-    # lst_hiddens = [50, 300, 800]
-
-    for s in lst_seed:
-        for m in range(len(lst_hiddens)):
-            for n in range(m, len(lst_hiddens)):
-                args.seed = s
-                args.lstm_opt1 = lst_hiddens[m]
-                args.lstm_opt2 = lst_hiddens[n]
-
-                main(args)
-
-def ex_cnn_kernel(args):
-    args.dataset = 'news'
-    args.n_epoch = 200
-    args.noise_type = 'symmetric'
-    args.noise_rate = 0.2
-    args.model1 = 'cnn'
-    args.model2 = 'cnn'
-
-    lst_seed = [1, 2, 3]
-    lst_kernels = [[3, 4], [5, 6], [3, 4, 5]]
-
-    for m in range(len(lst_kernels)):
-        for s in lst_seed:
-            args.model_type = 'coteaching_plus'
             args.seed = s
-            args.cnn_opt1 = lst_kernels[m]
-            args.cnn_opt2 = lst_kernels[m]
+            args.model1 = 'cnn'
+            args.model2 = models[m]
 
-            main(args)
-
-
-def ex_cnn_fcn_hidden(args):
-    args.dataset = 'news'
-    args.n_epoch = 200
-    args.noise_type = 'symmetric'
-    args.noise_rate = 0.2
-    args.model1 = 'cnn'
-    args.model2 = 'fcn'
-    args.model_type = 'coteaching_plus'
-    args.init_epoch = 0
-
-    lst_seed = [1, 2, 3]
-    fcn_lst_hiddens = [1500, 300, 50]
-
-    for s in lst_seed:
-        for n in range(len(fcn_lst_hiddens)):
-            args.seed = s
-            args.fcn_opt2 = fcn_lst_hiddens[n]
-
-            main(args)
-
-
-def ex_cnn_lstm_hidden(args):
-    args.dataset = 'news'
-    args.n_epoch = 200
-    args.noise_type = 'symmetric'
-    args.noise_rate = 0.2
-    args.model1 = 'cnn'
-    args.model2 = 'lstm'
-    args.model_type = 'coteaching_plus'
-    args.init_epoch = 0
-
-    args.batch_size = 64
-    lst_seed = [1]
-    lstm_lst_hiddens = [800]
-
-    for s in lst_seed:
-        for n in range(len(lstm_lst_hiddens)):
-            args.seed = s
-            args.lstm_opt2 = lstm_lst_hiddens[n]
-
-            logger.info(f'{args}')
             main(args)
 
 
 if __name__ == '__main__':
     args = arg_parse()
-
-    # ex_major_other_models_initepoch(args)
-    # ex_lstm_hidden(args)
     ex_major_other_models(args)
-
